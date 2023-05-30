@@ -1,0 +1,1 @@
+/usr/bin/cc -g  -rdynamic CMakeFiles/util_test.dir/util_test.c.o CMakeFiles/util_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/util.c.o  -o util_test  -lcheck -lsubunit -lrt -lm 

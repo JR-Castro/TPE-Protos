@@ -50,3 +50,15 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# MacOS
+.DS_Store
+
+# CMake Folder
+build/
+
+# GDB History
+.gdb_history
+
+# Valgrind output file
+valgrind-output.txt

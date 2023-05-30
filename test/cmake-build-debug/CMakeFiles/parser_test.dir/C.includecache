@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../../src/include/macros.h
+
+../../src/include/parser.h
+stdint.h
+-
+stddef.h
+-
+
+/home/nrossi/workspace/protos/TPE-Protos/test/parser_test.c
+stdio.h
+-
+stdlib.h
+-
+check.h
+-
+macros.h
+-
+parser.h
+-
+

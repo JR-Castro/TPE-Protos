@@ -1,0 +1,1 @@
+/usr/bin/cc -g  -rdynamic CMakeFiles/commands_parser_test.dir/commands_parser_test.c.o CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/util.c.o CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.o  -o commands_parser_test  -lcheck -lsubunit -lrt -lm 

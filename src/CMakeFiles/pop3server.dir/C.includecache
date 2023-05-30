@@ -1,0 +1,42 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/nrossi/workspace/protos/TPE-Protos/src/main.c
+
+/home/nrossi/workspace/protos/TPE-Protos/src/parsers/commands_parser.c
+stdio.h
+-
+stdlib.h
+-
+stdbool.h
+-
+string.h
+-
+stdint.h
+-
+parser.h
+/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.h
+
+/home/nrossi/workspace/protos/TPE-Protos/src/parsers/include/parser.h
+stdint.h
+-
+stddef.h
+-
+
+/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c
+stdbool.h
+-
+stdlib.h
+-
+string.h
+-
+assert.h
+-
+include/parser.h
+/home/nrossi/workspace/protos/TPE-Protos/src/parsers/include/parser.h
+

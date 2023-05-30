@@ -44,6 +44,11 @@ struct parser_state_transition {
 /** predicado para utilizar en `when' que retorna siempre true */
 static const unsigned ANY = 1 << 9;
 
+/** predicado para utilizar en `when' que retorna true si el char es valido */
+static const unsigned PWD_VALID_CHAR = 1 << 10;
+
+static const unsigned USERNAME_VALID_CHAR = 1 << 11;
+
 /** declaración completa de una máquina de estados */
 struct parser_definition {
     /** cantidad de estados */

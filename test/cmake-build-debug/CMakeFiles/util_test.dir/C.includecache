@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../../src/include/util.h
+ctype.h
+-
+stdbool.h
+-
+stdint.h
+-
+
+/home/nrossi/workspace/protos/TPE-Protos/test/util_test.c
+check.h
+-
+stdlib.h
+-
+stdio.h
+-
+util.h
+-
+
