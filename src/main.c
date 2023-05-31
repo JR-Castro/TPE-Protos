@@ -3,9 +3,12 @@
 #include <errno.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <signal.h>
 #include <string.h>
 #include <unistd.h>
 #include <netdb.h>
+
+#include "selector.h"
 
 #define SERVICE "pop3"
 #define DEFAULT_PORT "1100"
@@ -18,11 +21,38 @@ static int setupSocket();
 
 int main(const int argc, const char ** argv) {
 
+    int ret = 0;
+
     close(STDIN_FILENO);
 
     int serverSocket = setupSocket();
 
-    return 0;
+    const struct selector_init init = {
+            .signal = SIGALRM,
+            .select_timeout = {
+                    .tv_sec = 10,
+                    .tv_nsec = 0,
+            },
+    };
+
+    fd_selector selector = NULL;
+
+    if ((ret = selector_init(&init)) != SELECTOR_SUCCESS) goto finally;
+
+    selector = selector_new(SELECTOR_SIZE);
+    if (selector == NULL) goto finally;
+
+    // Make handlers
+
+    // Register fd's
+
+    // Loop
+
+finally:
+    if (serverSocket != -1) close(serverSocket);
+    if (selector != NULL) selector_destroy(selector);
+    selector_close();
+    return ret;
 }
 
 static int setupSocket() {
