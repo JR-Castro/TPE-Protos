@@ -1,8 +1,5 @@
 CFLAGS= -g --std=c11 -pedantic -pedantic-errors -Wall -Wextra -Wno-unused-parameter -Wno-newline-eof -Wno-implicit-fallthrough -D_POSIX_C_SOURCE=200112L -fsanitize=address
 
-LD=ld
-LDFLAGS=
-
 INCLUDE=-I src/include
 
 SOURCES=src/buffer.c src/main.c src/netutils.c src/parser.c src/parser_utils.c src/selector.c src/stm.c
