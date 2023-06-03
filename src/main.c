@@ -8,8 +8,8 @@
 #include "pop3.h"
 
 #define SERVICE "pop3"
-#define DEFAULT_PORT "110"
-#define DEFAULT_PORT_NUM 110
+#define DEFAULT_PORT "1100"
+#define DEFAULT_PORT_NUM 1100
 #define MAX_CON 3
 #define SELECTOR_SIZE 1024
 
@@ -107,6 +107,8 @@ static int setupSocket(void) {
         goto handle_error;
 
     if (listen(newSocket, MAX_CON)) goto handle_error;
+
+    if (selector_fd_set_nio(newSocket) == -1) goto handle_error;
 
     return newSocket;
 
