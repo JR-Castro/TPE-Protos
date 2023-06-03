@@ -18,6 +18,14 @@ test: $(TEST_OUTPUTS)
 tests/%.out: tests/%.c
 	$(CC) $(CFLAGS) -lcheck $(INCLUDE) $< -o $@
 
+check: clean
+	pvs-studio-analyzer trace -- make
+	pvs-studio-analyzer analyze
+	plog-converter -a '64:1,2,3;GA:1,2,3;OP:1,2,3' -t tasklist -o ./report.tasks ./PVS-Studio.log
+
+	rm PVS-Studio.log
+	mv strace_out check
+
 clean:
 	rm -rf src/*.o *.o $(OUTPUT)
 
