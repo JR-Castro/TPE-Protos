@@ -1,5 +1,7 @@
 CFLAGS= -g --std=c11 -pedantic -pedantic-errors -Wall -Wextra -Wno-unused-parameter -Wno-newline-eof -Wno-implicit-fallthrough -D_POSIX_C_SOURCE=200112L -fsanitize=address
 
+LDFLAGS= -pthread
+
 INCLUDE=-I src/include
 
 SOURCES=src/buffer.c src/main.c src/netutils.c src/parser.c src/parser_utils.c src/selector.c src/stm.c src/pop3.c
@@ -11,7 +13,7 @@ TEST_OUTPUTS=$(TESTS:.c=.out)
 OUTPUT=server
 
 all: $(SOURCES)
-	$(CC) $(CFLAGS) $(INCLUDE) -o $(OUTPUT) $(SOURCES)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(INCLUDE) -o $(OUTPUT) $(SOURCES)
 
 test: $(TEST_OUTPUTS)
 
