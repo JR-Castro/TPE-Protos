@@ -15,6 +15,7 @@
 #define MAX_CON 3
 #define SELECTOR_SIZE 1024
 
+// skipcq: CXX-W2009
 static bool terminate = false;
 
 static int setupSocket(void);

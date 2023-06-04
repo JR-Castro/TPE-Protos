@@ -115,7 +115,8 @@ static void pop3Read(struct selector_key *key);
 static void pop3Write(struct selector_key *key);
 static void pop3Block(struct selector_key *key);
 static void pop3Close(struct selector_key *key);
-static fd_handler pop3Handlers = {
+
+static const fd_handler pop3Handlers = {
     .handle_read = pop3Read,
     .handle_write = pop3Write,
     .handle_block = pop3Block,
