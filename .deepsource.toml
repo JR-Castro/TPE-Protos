@@ -1,0 +1,8 @@
+version = 1
+
+test_patterns = ["tests/**"]
+
+exclude_patterns = ["foo.dot"]
+
+[[analyzers]]
+name = "cxx"
