@@ -8,7 +8,12 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
-#include "netutils.h"
+#include "include/netutils.h"
+
+//Patch for MacOS
+#ifndef MSG_NOSIGNAL
+#define MSG_NOSIGNAL 0
+#endif
 
 #define N(x) (sizeof(x)/sizeof((x)[0]))
 

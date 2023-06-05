@@ -6,14 +6,17 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "selector.h"
+#include "include/selector.h"
 #include "pop3.h"
+#include "include/args.h"
 
 #define SERVICE "pop3"
 #define DEFAULT_PORT "1100"
 #define DEFAULT_PORT_NUM 1100
 #define MAX_CON 3
 #define SELECTOR_SIZE 1024
+
+extern struct pop3_args pop3_args;
 
 // skipcq: CXX-W2009
 static bool terminate = false;
@@ -25,15 +28,18 @@ static void sigterm_handler(const int signal) {
     terminate = true;
 }
 
-int main(const int argc, const char **argv) {
+int main(const int argc, char **argv) {
 
     int ret = 0;
+
+//    parse_args(argc, argv, &pop3_args);
 
     close(STDIN_FILENO);
     signal(SIGTERM, sigterm_handler);
     signal(SIGINT, sigterm_handler);
 
     int serverSocket = setupSocket();
+
 
     const struct selector_init init = {
             .signal = SIGALRM,
@@ -121,4 +127,7 @@ static int setupSocket(void) {
     close(newSocket);
 
     return -1;
+
+
 }
+
