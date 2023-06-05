@@ -85,7 +85,8 @@ START_TEST (test_parse_valid_username) {
          bool crlf = consume_until_crlf(b, args, readBytes);
          if (crlf) {
              // valid input saves read args in cmd->args
-             cmd->args = args;
+             cmd->args = emalloc(N(args));
+             strcpy(cmd->args, args);
              p->state = buffer_can_read(b) ? CMD_DISPATCH : CMD_OK;
          } else {
              // invalid input
@@ -100,8 +101,9 @@ START_TEST (test_parse_valid_username) {
     }
     printParsedCommandsNames(p->commands_queue);
     struct command *parsed_cmd = (struct command *) peekTail(p->commands_queue);
-    ck_assert_str_eq("USER ", parsed_cmd->description->name);
-    ck_assert_str_eq("USER ", parsed_cmd->description->name);
+    ck_assert_str_eq("USER ",  parsed_cmd->description->name);
+    log(DEBUG, "Command args: %s", parsed_cmd->args);
+    ck_assert_str_eq("pr0t0s", parsed_cmd->args);
 
 } END_TEST
 

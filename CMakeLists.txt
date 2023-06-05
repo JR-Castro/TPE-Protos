@@ -14,7 +14,7 @@ add_subdirectory(src)
 add_subdirectory(test)
 
 # Set the compiler flags
-set(CMAKE_C_FLAGS    "-pthread -g  -ggdb --std=c11 -pedantic -pedantic-errors
+set(CMAKE_C_FLAGS    "-pthread -g  -ggdb --std=c11 -pedantic -pedantic-errors -gdwarf-4
                       -Wall -Wextra -Wno-unused-parameter -Wno-implicit-fallthrough -D_POSIX_C_SOURCE=200112L")
 
 set(CLANG_TIDY_CHECKS *

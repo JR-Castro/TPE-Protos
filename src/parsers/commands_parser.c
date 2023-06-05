@@ -131,8 +131,9 @@ bool consume_until_crlf (buffer *b, uint8_t *ret, size_t *n) {
             break;
         }
     }
-    n = &i;
-
+    size_t readBytes = i-1;
+    n = &readBytes;
+    log(DEBUG, "[consume_until_crlf] ret: %s, readBytes: %zu", ret, *n)
     return crlf;
 }
 

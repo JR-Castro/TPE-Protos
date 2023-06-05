@@ -44,7 +44,7 @@ struct command_description commands[] = {
 
 struct command {
     struct command_description * description;
-    char * args;
+    uint8_t * args;
 };
 
 enum command_state {

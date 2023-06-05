@@ -1,0 +1,1 @@
+/usr/bin/cc -g  -rdynamic CMakeFiles/queue_test.dir/queue_test.c.o CMakeFiles/queue_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/logger.c.o CMakeFiles/queue_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.o CMakeFiles/queue_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/queue.c.o  -o queue_test  -lcheck -lsubunit -lrt -lm 

@@ -63,10 +63,6 @@ parser_feed(struct parser *p, const uint8_t c) {
             matched = (c == when);
         } else if(state[i].when == ANY) {
             matched = true;
-        } else if (state[i].when == PWD_VALID_CHAR) {
-            matched = isValidPwdChar(c);
-        } else if (state[i].when == USERNAME_VALID_CHAR) {
-            matched = isValidUsernameChar(c);
         } else if(state[i].when > 0xFF) {
             matched = (type & when);
         } else {

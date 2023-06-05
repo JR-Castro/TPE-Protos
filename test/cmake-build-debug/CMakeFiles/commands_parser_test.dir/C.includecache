@@ -6,7 +6,35 @@
 
 #IncludeRegexTransform: 
 
+../../src/include/buffer.h
+stdbool.h
+-
+unistd.h
+-
+
 ../../src/include/commands_parser.h
+stdlib.h
+-
+stdbool.h
+-
+string.h
+-
+stdint.h
+-
+macros.h
+-
+queue.h
+-
+
+../../src/include/emalloc.h
+logger.h
+-
+
+../../src/include/logger.h
+stdio.h
+-
+stdlib.h
+-
 
 ../../src/include/macros.h
 
@@ -16,22 +44,26 @@ stdint.h
 stddef.h
 -
 
-/home/nrossi/workspace/protos/TPE-Protos/src/parsers/commands_parser.c
-stdio.h
--
+../../src/include/parser_utils.h
+parser.h
+../../src/include/parser.h
+
+../../src/include/queue.h
 stdlib.h
 -
 stdbool.h
 -
-string.h
+
+/home/nrossi/workspace/protos/TPE-Protos/src/parsers/commands_parser.c
+stdio.h
 -
-stdint.h
--
-parser.h
--
-macros.h
+logger.h
 -
 commands_parser.h
+-
+parser_utils.h
+-
+emalloc.h
 -
 
 /home/nrossi/workspace/protos/TPE-Protos/test/commands_parser_test.c
@@ -41,9 +73,15 @@ stdlib.h
 -
 check.h
 -
+buffer.h
+-
 macros.h
 -
+logger.h
+-
 parser.h
+-
+commands_parser.h
 -
 ../src/parsers/commands_parser.c
 /home/nrossi/workspace/protos/TPE-Protos/src/parsers/commands_parser.c

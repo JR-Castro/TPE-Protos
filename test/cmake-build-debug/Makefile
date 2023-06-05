@@ -135,6 +135,19 @@ util_test/fast:
 .PHONY : util_test/fast
 
 #=============================================================================
+# Target rules for targets named parser_test
+
+# Build rule for target.
+parser_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 parser_test
+.PHONY : parser_test
+
+# fast build rule for target.
+parser_test/fast:
+	$(MAKE) -f CMakeFiles/parser_test.dir/build.make CMakeFiles/parser_test.dir/build
+.PHONY : parser_test/fast
+
+#=============================================================================
 # Target rules for targets named NightlyMemCheck
 
 # Build rule for target.
@@ -369,6 +382,19 @@ NightlySubmit/fast:
 .PHONY : NightlySubmit/fast
 
 #=============================================================================
+# Target rules for targets named parser_utils_test
+
+# Build rule for target.
+parser_utils_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 parser_utils_test
+.PHONY : parser_utils_test
+
+# fast build rule for target.
+parser_utils_test/fast:
+	$(MAKE) -f CMakeFiles/parser_utils_test.dir/build.make CMakeFiles/parser_utils_test.dir/build
+.PHONY : parser_utils_test/fast
+
+#=============================================================================
 # Target rules for targets named NightlyStart
 
 # Build rule for target.
@@ -393,6 +419,19 @@ ExperimentalCoverage: cmake_check_build_system
 ExperimentalCoverage/fast:
 	$(MAKE) -f CMakeFiles/ExperimentalCoverage.dir/build.make CMakeFiles/ExperimentalCoverage.dir/build
 .PHONY : ExperimentalCoverage/fast
+
+#=============================================================================
+# Target rules for targets named queue_test
+
+# Build rule for target.
+queue_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 queue_test
+.PHONY : queue_test
+
+# fast build rule for target.
+queue_test/fast:
+	$(MAKE) -f CMakeFiles/queue_test.dir/build.make CMakeFiles/queue_test.dir/build
+.PHONY : queue_test/fast
 
 #=============================================================================
 # Target rules for targets named NightlyCoverage
@@ -511,19 +550,6 @@ ContinuousSubmit/fast:
 	$(MAKE) -f CMakeFiles/ContinuousSubmit.dir/build.make CMakeFiles/ContinuousSubmit.dir/build
 .PHONY : ContinuousSubmit/fast
 
-#=============================================================================
-# Target rules for targets named parser_test
-
-# Build rule for target.
-parser_test: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 parser_test
-.PHONY : parser_test
-
-# fast build rule for target.
-parser_test/fast:
-	$(MAKE) -f CMakeFiles/parser_test.dir/build.make CMakeFiles/parser_test.dir/build
-.PHONY : parser_test/fast
-
 commands_parser_test.o: commands_parser_test.c.o
 
 .PHONY : commands_parser_test.o
@@ -551,14 +577,102 @@ commands_parser_test.c.s:
 	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/commands_parser_test.c.s
 .PHONY : commands_parser_test.c.s
 
+home/nrossi/workspace/protos/TPE-Protos/src/buffer.o: home/nrossi/workspace/protos/TPE-Protos/src/buffer.c.o
+
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/buffer.o
+
+# target to build an object file
+home/nrossi/workspace/protos/TPE-Protos/src/buffer.c.o:
+	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/buffer.c.o
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/buffer.c.o
+
+home/nrossi/workspace/protos/TPE-Protos/src/buffer.i: home/nrossi/workspace/protos/TPE-Protos/src/buffer.c.i
+
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/buffer.i
+
+# target to preprocess a source file
+home/nrossi/workspace/protos/TPE-Protos/src/buffer.c.i:
+	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/buffer.c.i
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/buffer.c.i
+
+home/nrossi/workspace/protos/TPE-Protos/src/buffer.s: home/nrossi/workspace/protos/TPE-Protos/src/buffer.c.s
+
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/buffer.s
+
+# target to generate assembly for a file
+home/nrossi/workspace/protos/TPE-Protos/src/buffer.c.s:
+	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/buffer.c.s
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/buffer.c.s
+
+home/nrossi/workspace/protos/TPE-Protos/src/emalloc.o: home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.o
+
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/emalloc.o
+
+# target to build an object file
+home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.o:
+	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.o
+	$(MAKE) -f CMakeFiles/queue_test.dir/build.make CMakeFiles/queue_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.o
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.o
+
+home/nrossi/workspace/protos/TPE-Protos/src/emalloc.i: home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.i
+
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/emalloc.i
+
+# target to preprocess a source file
+home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.i:
+	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.i
+	$(MAKE) -f CMakeFiles/queue_test.dir/build.make CMakeFiles/queue_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.i
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.i
+
+home/nrossi/workspace/protos/TPE-Protos/src/emalloc.s: home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.s
+
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/emalloc.s
+
+# target to generate assembly for a file
+home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.s:
+	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.s
+	$(MAKE) -f CMakeFiles/queue_test.dir/build.make CMakeFiles/queue_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.s
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.s
+
+home/nrossi/workspace/protos/TPE-Protos/src/logger.o: home/nrossi/workspace/protos/TPE-Protos/src/logger.c.o
+
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/logger.o
+
+# target to build an object file
+home/nrossi/workspace/protos/TPE-Protos/src/logger.c.o:
+	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/logger.c.o
+	$(MAKE) -f CMakeFiles/queue_test.dir/build.make CMakeFiles/queue_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/logger.c.o
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/logger.c.o
+
+home/nrossi/workspace/protos/TPE-Protos/src/logger.i: home/nrossi/workspace/protos/TPE-Protos/src/logger.c.i
+
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/logger.i
+
+# target to preprocess a source file
+home/nrossi/workspace/protos/TPE-Protos/src/logger.c.i:
+	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/logger.c.i
+	$(MAKE) -f CMakeFiles/queue_test.dir/build.make CMakeFiles/queue_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/logger.c.i
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/logger.c.i
+
+home/nrossi/workspace/protos/TPE-Protos/src/logger.s: home/nrossi/workspace/protos/TPE-Protos/src/logger.c.s
+
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/logger.s
+
+# target to generate assembly for a file
+home/nrossi/workspace/protos/TPE-Protos/src/logger.c.s:
+	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/logger.c.s
+	$(MAKE) -f CMakeFiles/queue_test.dir/build.make CMakeFiles/queue_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/logger.c.s
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/logger.c.s
+
 home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.o: home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.o
 
 .PHONY : home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.o
 
 # target to build an object file
 home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.o:
-	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.o
 	$(MAKE) -f CMakeFiles/parser_test.dir/build.make CMakeFiles/parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.o
+	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.o
+	$(MAKE) -f CMakeFiles/parser_utils_test.dir/build.make CMakeFiles/parser_utils_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.o
 .PHONY : home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.o
 
 home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.i: home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.i
@@ -567,8 +681,9 @@ home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.i: home/nrossi/worksp
 
 # target to preprocess a source file
 home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.i:
-	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.i
 	$(MAKE) -f CMakeFiles/parser_test.dir/build.make CMakeFiles/parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.i
+	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.i
+	$(MAKE) -f CMakeFiles/parser_utils_test.dir/build.make CMakeFiles/parser_utils_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.i
 .PHONY : home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.i
 
 home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.s: home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.s
@@ -577,9 +692,70 @@ home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.s: home/nrossi/worksp
 
 # target to generate assembly for a file
 home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.s:
-	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.s
 	$(MAKE) -f CMakeFiles/parser_test.dir/build.make CMakeFiles/parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.s
+	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.s
+	$(MAKE) -f CMakeFiles/parser_utils_test.dir/build.make CMakeFiles/parser_utils_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.s
 .PHONY : home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.s
+
+home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.o: home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.o
+
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.o
+
+# target to build an object file
+home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.o:
+	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.o
+	$(MAKE) -f CMakeFiles/parser_utils_test.dir/build.make CMakeFiles/parser_utils_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.o
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.o
+
+home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.i: home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.i
+
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.i
+
+# target to preprocess a source file
+home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.i:
+	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.i
+	$(MAKE) -f CMakeFiles/parser_utils_test.dir/build.make CMakeFiles/parser_utils_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.i
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.i
+
+home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.s: home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.s
+
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.s
+
+# target to generate assembly for a file
+home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.s:
+	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.s
+	$(MAKE) -f CMakeFiles/parser_utils_test.dir/build.make CMakeFiles/parser_utils_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.s
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.s
+
+home/nrossi/workspace/protos/TPE-Protos/src/queue.o: home/nrossi/workspace/protos/TPE-Protos/src/queue.c.o
+
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/queue.o
+
+# target to build an object file
+home/nrossi/workspace/protos/TPE-Protos/src/queue.c.o:
+	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/queue.c.o
+	$(MAKE) -f CMakeFiles/queue_test.dir/build.make CMakeFiles/queue_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/queue.c.o
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/queue.c.o
+
+home/nrossi/workspace/protos/TPE-Protos/src/queue.i: home/nrossi/workspace/protos/TPE-Protos/src/queue.c.i
+
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/queue.i
+
+# target to preprocess a source file
+home/nrossi/workspace/protos/TPE-Protos/src/queue.c.i:
+	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/queue.c.i
+	$(MAKE) -f CMakeFiles/queue_test.dir/build.make CMakeFiles/queue_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/queue.c.i
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/queue.c.i
+
+home/nrossi/workspace/protos/TPE-Protos/src/queue.s: home/nrossi/workspace/protos/TPE-Protos/src/queue.c.s
+
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/queue.s
+
+# target to generate assembly for a file
+home/nrossi/workspace/protos/TPE-Protos/src/queue.c.s:
+	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/queue.c.s
+	$(MAKE) -f CMakeFiles/queue_test.dir/build.make CMakeFiles/queue_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/queue.c.s
+.PHONY : home/nrossi/workspace/protos/TPE-Protos/src/queue.c.s
 
 home/nrossi/workspace/protos/TPE-Protos/src/util.o: home/nrossi/workspace/protos/TPE-Protos/src/util.c.o
 
@@ -588,8 +764,9 @@ home/nrossi/workspace/protos/TPE-Protos/src/util.o: home/nrossi/workspace/protos
 # target to build an object file
 home/nrossi/workspace/protos/TPE-Protos/src/util.c.o:
 	$(MAKE) -f CMakeFiles/util_test.dir/build.make CMakeFiles/util_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/util.c.o
-	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/util.c.o
 	$(MAKE) -f CMakeFiles/parser_test.dir/build.make CMakeFiles/parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/util.c.o
+	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/util.c.o
+	$(MAKE) -f CMakeFiles/parser_utils_test.dir/build.make CMakeFiles/parser_utils_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/util.c.o
 .PHONY : home/nrossi/workspace/protos/TPE-Protos/src/util.c.o
 
 home/nrossi/workspace/protos/TPE-Protos/src/util.i: home/nrossi/workspace/protos/TPE-Protos/src/util.c.i
@@ -599,8 +776,9 @@ home/nrossi/workspace/protos/TPE-Protos/src/util.i: home/nrossi/workspace/protos
 # target to preprocess a source file
 home/nrossi/workspace/protos/TPE-Protos/src/util.c.i:
 	$(MAKE) -f CMakeFiles/util_test.dir/build.make CMakeFiles/util_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/util.c.i
-	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/util.c.i
 	$(MAKE) -f CMakeFiles/parser_test.dir/build.make CMakeFiles/parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/util.c.i
+	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/util.c.i
+	$(MAKE) -f CMakeFiles/parser_utils_test.dir/build.make CMakeFiles/parser_utils_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/util.c.i
 .PHONY : home/nrossi/workspace/protos/TPE-Protos/src/util.c.i
 
 home/nrossi/workspace/protos/TPE-Protos/src/util.s: home/nrossi/workspace/protos/TPE-Protos/src/util.c.s
@@ -610,8 +788,9 @@ home/nrossi/workspace/protos/TPE-Protos/src/util.s: home/nrossi/workspace/protos
 # target to generate assembly for a file
 home/nrossi/workspace/protos/TPE-Protos/src/util.c.s:
 	$(MAKE) -f CMakeFiles/util_test.dir/build.make CMakeFiles/util_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/util.c.s
-	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/util.c.s
 	$(MAKE) -f CMakeFiles/parser_test.dir/build.make CMakeFiles/parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/util.c.s
+	$(MAKE) -f CMakeFiles/commands_parser_test.dir/build.make CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/util.c.s
+	$(MAKE) -f CMakeFiles/parser_utils_test.dir/build.make CMakeFiles/parser_utils_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/util.c.s
 .PHONY : home/nrossi/workspace/protos/TPE-Protos/src/util.c.s
 
 parser_test.o: parser_test.c.o
@@ -640,6 +819,60 @@ parser_test.s: parser_test.c.s
 parser_test.c.s:
 	$(MAKE) -f CMakeFiles/parser_test.dir/build.make CMakeFiles/parser_test.dir/parser_test.c.s
 .PHONY : parser_test.c.s
+
+parser_utils_test.o: parser_utils_test.c.o
+
+.PHONY : parser_utils_test.o
+
+# target to build an object file
+parser_utils_test.c.o:
+	$(MAKE) -f CMakeFiles/parser_utils_test.dir/build.make CMakeFiles/parser_utils_test.dir/parser_utils_test.c.o
+.PHONY : parser_utils_test.c.o
+
+parser_utils_test.i: parser_utils_test.c.i
+
+.PHONY : parser_utils_test.i
+
+# target to preprocess a source file
+parser_utils_test.c.i:
+	$(MAKE) -f CMakeFiles/parser_utils_test.dir/build.make CMakeFiles/parser_utils_test.dir/parser_utils_test.c.i
+.PHONY : parser_utils_test.c.i
+
+parser_utils_test.s: parser_utils_test.c.s
+
+.PHONY : parser_utils_test.s
+
+# target to generate assembly for a file
+parser_utils_test.c.s:
+	$(MAKE) -f CMakeFiles/parser_utils_test.dir/build.make CMakeFiles/parser_utils_test.dir/parser_utils_test.c.s
+.PHONY : parser_utils_test.c.s
+
+queue_test.o: queue_test.c.o
+
+.PHONY : queue_test.o
+
+# target to build an object file
+queue_test.c.o:
+	$(MAKE) -f CMakeFiles/queue_test.dir/build.make CMakeFiles/queue_test.dir/queue_test.c.o
+.PHONY : queue_test.c.o
+
+queue_test.i: queue_test.c.i
+
+.PHONY : queue_test.i
+
+# target to preprocess a source file
+queue_test.c.i:
+	$(MAKE) -f CMakeFiles/queue_test.dir/build.make CMakeFiles/queue_test.dir/queue_test.c.i
+.PHONY : queue_test.c.i
+
+queue_test.s: queue_test.c.s
+
+.PHONY : queue_test.s
+
+# target to generate assembly for a file
+queue_test.c.s:
+	$(MAKE) -f CMakeFiles/queue_test.dir/build.make CMakeFiles/queue_test.dir/queue_test.c.s
+.PHONY : queue_test.c.s
 
 util_test.o: util_test.c.o
 
@@ -677,6 +910,7 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... test"
 	@echo "... util_test"
+	@echo "... parser_test"
 	@echo "... edit_cache"
 	@echo "... NightlyMemCheck"
 	@echo "... NightlyTest"
@@ -696,8 +930,10 @@ help:
 	@echo "... Continuous"
 	@echo "... Nightly"
 	@echo "... NightlySubmit"
+	@echo "... parser_utils_test"
 	@echo "... NightlyStart"
 	@echo "... ExperimentalCoverage"
+	@echo "... queue_test"
 	@echo "... NightlyCoverage"
 	@echo "... ExperimentalStart"
 	@echo "... NightlyBuild"
@@ -707,19 +943,39 @@ help:
 	@echo "... ContinuousMemCheck"
 	@echo "... ContinuousTest"
 	@echo "... ContinuousSubmit"
-	@echo "... parser_test"
 	@echo "... commands_parser_test.o"
 	@echo "... commands_parser_test.i"
 	@echo "... commands_parser_test.s"
+	@echo "... home/nrossi/workspace/protos/TPE-Protos/src/buffer.o"
+	@echo "... home/nrossi/workspace/protos/TPE-Protos/src/buffer.i"
+	@echo "... home/nrossi/workspace/protos/TPE-Protos/src/buffer.s"
+	@echo "... home/nrossi/workspace/protos/TPE-Protos/src/emalloc.o"
+	@echo "... home/nrossi/workspace/protos/TPE-Protos/src/emalloc.i"
+	@echo "... home/nrossi/workspace/protos/TPE-Protos/src/emalloc.s"
+	@echo "... home/nrossi/workspace/protos/TPE-Protos/src/logger.o"
+	@echo "... home/nrossi/workspace/protos/TPE-Protos/src/logger.i"
+	@echo "... home/nrossi/workspace/protos/TPE-Protos/src/logger.s"
 	@echo "... home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.o"
 	@echo "... home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.i"
 	@echo "... home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.s"
+	@echo "... home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.o"
+	@echo "... home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.i"
+	@echo "... home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.s"
+	@echo "... home/nrossi/workspace/protos/TPE-Protos/src/queue.o"
+	@echo "... home/nrossi/workspace/protos/TPE-Protos/src/queue.i"
+	@echo "... home/nrossi/workspace/protos/TPE-Protos/src/queue.s"
 	@echo "... home/nrossi/workspace/protos/TPE-Protos/src/util.o"
 	@echo "... home/nrossi/workspace/protos/TPE-Protos/src/util.i"
 	@echo "... home/nrossi/workspace/protos/TPE-Protos/src/util.s"
 	@echo "... parser_test.o"
 	@echo "... parser_test.i"
 	@echo "... parser_test.s"
+	@echo "... parser_utils_test.o"
+	@echo "... parser_utils_test.i"
+	@echo "... parser_utils_test.s"
+	@echo "... queue_test.o"
+	@echo "... queue_test.i"
+	@echo "... queue_test.s"
 	@echo "... util_test.o"
 	@echo "... util_test.i"
 	@echo "... util_test.s"

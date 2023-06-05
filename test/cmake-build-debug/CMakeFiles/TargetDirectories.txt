@@ -1,6 +1,7 @@
 /home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles/rebuild_cache.dir
 /home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles/test.dir
 /home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles/util_test.dir
+/home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles/parser_test.dir
 /home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles/edit_cache.dir
 /home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles/NightlyMemCheck.dir
 /home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles/NightlyTest.dir
@@ -20,8 +21,10 @@
 /home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles/Continuous.dir
 /home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles/Nightly.dir
 /home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles/NightlySubmit.dir
+/home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles/parser_utils_test.dir
 /home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles/NightlyStart.dir
 /home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles/ExperimentalCoverage.dir
+/home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles/queue_test.dir
 /home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles/NightlyCoverage.dir
 /home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles/ExperimentalStart.dir
 /home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles/NightlyBuild.dir
@@ -31,4 +34,3 @@
 /home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles/ContinuousMemCheck.dir
 /home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles/ContinuousTest.dir
 /home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles/ContinuousSubmit.dir
-/home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles/parser_test.dir

@@ -83,9 +83,74 @@ CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/util.c.s"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/nrossi/workspace/protos/TPE-Protos/src/util.c -o CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/util.c.s
 
+CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/logger.c.o: CMakeFiles/commands_parser_test.dir/flags.make
+CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/logger.c.o: /home/nrossi/workspace/protos/TPE-Protos/src/logger.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/logger.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/logger.c.o   -c /home/nrossi/workspace/protos/TPE-Protos/src/logger.c
+
+CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/logger.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/logger.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/nrossi/workspace/protos/TPE-Protos/src/logger.c > CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/logger.c.i
+
+CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/logger.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/logger.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/nrossi/workspace/protos/TPE-Protos/src/logger.c -o CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/logger.c.s
+
+CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.o: CMakeFiles/commands_parser_test.dir/flags.make
+CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.o: /home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.o   -c /home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c
+
+CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c > CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.i
+
+CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c -o CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.s
+
+CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/queue.c.o: CMakeFiles/commands_parser_test.dir/flags.make
+CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/queue.c.o: /home/nrossi/workspace/protos/TPE-Protos/src/queue.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/queue.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/queue.c.o   -c /home/nrossi/workspace/protos/TPE-Protos/src/queue.c
+
+CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/queue.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/queue.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/nrossi/workspace/protos/TPE-Protos/src/queue.c > CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/queue.c.i
+
+CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/queue.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/queue.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/nrossi/workspace/protos/TPE-Protos/src/queue.c -o CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/queue.c.s
+
+CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/buffer.c.o: CMakeFiles/commands_parser_test.dir/flags.make
+CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/buffer.c.o: /home/nrossi/workspace/protos/TPE-Protos/src/buffer.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building C object CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/buffer.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/buffer.c.o   -c /home/nrossi/workspace/protos/TPE-Protos/src/buffer.c
+
+CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/buffer.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/buffer.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/nrossi/workspace/protos/TPE-Protos/src/buffer.c > CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/buffer.c.i
+
+CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/buffer.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/buffer.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/nrossi/workspace/protos/TPE-Protos/src/buffer.c -o CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/buffer.c.s
+
+CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.o: CMakeFiles/commands_parser_test.dir/flags.make
+CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.o: /home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building C object CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.o   -c /home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c
+
+CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c > CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.i
+
+CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c -o CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.s
+
 CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.o: CMakeFiles/commands_parser_test.dir/flags.make
 CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.o: /home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building C object CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.o   -c /home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c
 
 CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.i: cmake_force
@@ -100,6 +165,11 @@ CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/
 commands_parser_test_OBJECTS = \
 "CMakeFiles/commands_parser_test.dir/commands_parser_test.c.o" \
 "CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/util.c.o" \
+"CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/logger.c.o" \
+"CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.o" \
+"CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/queue.c.o" \
+"CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/buffer.c.o" \
+"CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.o" \
 "CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.o"
 
 # External object files for target commands_parser_test
@@ -107,10 +177,15 @@ commands_parser_test_EXTERNAL_OBJECTS =
 
 commands_parser_test: CMakeFiles/commands_parser_test.dir/commands_parser_test.c.o
 commands_parser_test: CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/util.c.o
+commands_parser_test: CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/logger.c.o
+commands_parser_test: CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/emalloc.c.o
+commands_parser_test: CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/queue.c.o
+commands_parser_test: CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/buffer.c.o
+commands_parser_test: CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser_utils.c.o
 commands_parser_test: CMakeFiles/commands_parser_test.dir/home/nrossi/workspace/protos/TPE-Protos/src/parsers/parser.c.o
 commands_parser_test: CMakeFiles/commands_parser_test.dir/build.make
 commands_parser_test: CMakeFiles/commands_parser_test.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking C executable commands_parser_test"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/nrossi/workspace/protos/TPE-Protos/test/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking C executable commands_parser_test"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/commands_parser_test.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
