@@ -1,290 +1,177 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-#include <stdint.h>
-
-#include <parser.h>
-#include <macros.h>
+#include <logger.h>
 #include <commands_parser.h>
+#include <parser_utils.h>
+#include <emalloc.h>
 
-enum states {
-    S0_OK,
-    S1_CMD_USER,
-    S2_CMD_USER,
-    S3_CMD_USER,
-    S4_CMD_USER,
-    S5_USERNAME,
-    S6_USERNAME_INVALID,
-    S7_CMD_PASS,
-    S8_CMD_PASS,
-    S9_CMD_PASS,
-    S10_CMD_PASS,
-    S11_PWD,
-    S12_PWD_INVALID,
-//    S13,
-//    S14,
-//    S15,
-    S16_CMD_INVALID,
-};
+////////////////////////////////////////////////////////////
+// STATIC PROTOTYPES
+struct command_parser * command_parser_init();
 
-enum event_type {
-    EVENT_OK,
-    EVENT_CMD_USER,
-    EVENT_USERNAME,
-    EVENT_USERNAME_INVALID,
-    EVENT_CMD_PASS,
-    EVENT_PWD,
-    EVENT_PWD_INVALID,
-    EVENT_CMD_QUIT,
-    EVENT_CMD_STAT,
-    EVENT_CMD_LIST,
-    EVENT_CMD_RETR,
-    EVENT_CMD_DELE,
-    EVENT_CMD_NOOP,
-    EVENT_CMD_RSET,
-    EVENT_CMD_TOP,
-    EVENT_CMD_INVALID,
-};
+static queue * available_commands_queue_init (struct command_parser *p);
 
-static void
-command_user(struct parser_event *ret, const uint8_t c) {
-    ret->type = EVENT_CMD_USER;
-    ret->n = 1;
-    ret->data[0] = c;
+static struct command * newCommand (struct command_description * desc);
+
+////////////////////////////////////////////////////////////
+// FUNCTIONS
+
+bool compareElements (void * a, void * b) {
+    return ((struct command_description *) a)->name == ((struct command_description *) b)->name;
 }
 
-static void
-username(struct parser_event *ret, const uint8_t c) {
-    ret->type = EVENT_USERNAME;
-    ret->n = 1;
-    ret->data[0] = c;
+struct command_parser * command_parser_init() {
+    log(DEBUG, "Initializing command parser...");
+    struct command_parser *p = emalloc(sizeof(struct command_parser));
+    p->state = CMD_DISPATCH;
+    p->commands_queue = newQueue(sizeof(struct command));
+    p->available_commands_queue = available_commands_queue_init(p);
+
+    log(DEBUG, "command parser initialization DONE!");
+    return p;
 }
 
-static void
-username_invalid(struct parser_event *ret, const uint8_t c) {
-    ret->type = EVENT_USERNAME_INVALID;
-    ret->n = 1;
-    ret->data[0] = c;
+static queue * available_commands_queue_init(struct command_parser *p) {
+    log(DEBUG, "Initializing available commands queue...");
+    queue * q = newQueue(sizeof(struct command_description));
+
+//    for (int i = 0; i < N(commands); i++) {
+//        const struct parser_definition def = parser_utils_strcmpi(commands[i].name);
+//        commands[i].parser = parser_init(parser_no_classes(), &def);
+//        q = add(q, &(commands[i]));
+//    }
+
+    // tried to use a for loop, but it didn't work. Complained about const assignment.
+    // Weird! so I'm using this ugly code instead.
+    const struct parser_definition user = parser_utils_strcmpi("USER ");
+    commands[CMD_USER].parser = parser_init(parser_no_classes(), &user);
+    q = add(q, &(commands[CMD_USER]));
+
+    const struct parser_definition pass = parser_utils_strcmpi("PASS ");
+    commands[CMD_PASS].parser = parser_init(parser_no_classes(), &pass);
+    q = add(q, &(commands[CMD_PASS]));
+
+    const struct parser_definition stat = parser_utils_strcmpi("STAT\r\n");
+    commands[CMD_STAT].parser = parser_init(parser_no_classes(), &stat);
+    q = add(q, &(commands[CMD_STAT]));
+
+    const struct parser_definition list = parser_utils_strcmpi("LIST ");
+    commands[CMD_LIST].parser = parser_init(parser_no_classes(), &list);
+    q = add(q, &(commands[CMD_LIST]));
+
+    const struct parser_definition retr = parser_utils_strcmpi("RETR ");
+    commands[CMD_RETR].parser = parser_init(parser_no_classes(), &retr);
+    q = add(q, &(commands[CMD_RETR]));
+
+    const struct parser_definition dele = parser_utils_strcmpi("DELE ");
+    commands[CMD_DELE].parser = parser_init(parser_no_classes(), &dele);
+    q = add(q, &(commands[CMD_DELE]));
+
+    const struct parser_definition noop = parser_utils_strcmpi("NOOP\r\n");
+    commands[CMD_NOOP].parser = parser_init(parser_no_classes(), &noop);
+    q = add(q, &(commands[CMD_NOOP]));
+
+    const struct parser_definition quit = parser_utils_strcmpi("QUIT\r\n");
+    commands[CMD_QUIT].parser = parser_init(parser_no_classes(), &quit);
+    q = add(q, &(commands[CMD_QUIT]));
+
+    p->available_commands_queue = q;
+    log(DEBUG, "available commands queue initialization DONE!");
+
+    return p->available_commands_queue;
 }
 
-static void
-st_ok(struct parser_event *ret, const uint8_t c) {
-    ret->type = EVENT_OK;
-    ret->n = 1;
-    ret->data[0] = c;
+enum command_state command_parser_feed(struct command_parser *p, uint8_t c) {
+    enum command_state next_state = CMD_DISPATCH;
+
+    // Iterating over commands array
+    for (int i = 0; i < N(commands); i++) {
+        if (!commands[i].active) {
+            continue;
+        }
+        struct parser *cmd_parser = commands[i].parser;
+        const struct parser_event *event = parser_feed(cmd_parser, c);
+        if (event->type == STRING_CMP_EQ) {
+            log(DEBUG, "Command matched: %s", commands[i].name);
+            p->commands_queue = add(p->commands_queue, newCommand(&(commands[i])));
+            // active all parser for next iteration
+            for (int i = 0; i < N(commands); i++) {
+                commands[i].active = true;
+            }
+            next_state = CMD_ARGS;
+            break;
+        } else if (event->type == STRING_CMP_MAYEQ) {
+            log(DEBUG, "may matched: %s", commands[i].name);
+            next_state = CMD_MAYEQ;
+        } else {
+            log(DEBUG, "Command did not matched: %s", commands[i].name);
+            commands[i].active = false;
+        }
+    }
+    if (next_state == CMD_DISPATCH) {
+        log(DEBUG, "No command matched");
+        struct command_description * invalid_cmd = emalloc(sizeof(struct command_description));
+        invalid_cmd->name = "INVALID";
+        invalid_cmd->type = CMD_INVALID;
+        p->commands_queue = add(p->commands_queue, newCommand(invalid_cmd));
+        next_state = CMD_INVALID;
+    }
+
+    return next_state;
 }
 
-static void
-command_pass(struct parser_event *ret, const uint8_t c) {
-    ret->type = EVENT_CMD_PASS;
-    ret->n = 1;
-    ret->data[0] = c;
+bool consume_until_crlf (buffer *b, uint8_t *ret, size_t *n) {
+    bool crlf = false;
+    size_t i = 0;
+    while (buffer_can_read(b)) {
+        ret[i++] = buffer_read(b);
+        if (i > 2 && ret[i-1] == '\n' && ret[i-2] == '\r') {
+            log(DEBUG, "Found CRLF")
+            crlf = true;
+            ret[i-2] = '\0';
+            break;
+        }
+    }
+    n = &i;
+
+    return crlf;
 }
 
-static void
-pwd(struct parser_event *ret, const uint8_t c) {
-    ret->type = EVENT_PWD;
-    ret->n = 1;
-    ret->data[0] = c;
+void command_parser_destroy(struct command_parser *p) {
+   // TODO
 }
 
-static void
-pwd_invalid(struct parser_event *ret, const uint8_t c) {
-    ret->type = EVENT_PWD_INVALID;
-    ret->n = 1;
-    ret->data[0] = c;
+static struct command * newCommand (struct command_description * desc) {
+    struct command * cmd = emalloc(sizeof(struct command));
+    cmd->description = emalloc(sizeof(struct command_description));
+    cmd->description = desc;
+    cmd->args = NULL;
+
+    return cmd;
 }
 
-//static void
-//command_quit(struct parser_event *ret, const uint8_t c) {
-//    ret->type = COMMAND_QUIT;
-//    ret->n = 4;
-//    strncpy(ret->data, "QUIT", 4);
-//}
-//
-//static void
-//command_stat(struct parser_event *ret, const uint8_t c) {
-//    ret->type = COMMAND_STAT;
-//    ret->n = 4;
-//    strncpy(ret->data, "STAT", 4);
-//}
-//
-//static void
-//command_list(struct parser_event *ret, const uint8_t c) {
-//    ret->type = COMMAND_LIST;
-//    ret->n = 4;
-//    strncpy(ret->data, "LIST", 4);
-//}
-//
-//static void
-//command_retr(struct parser_event *ret, const uint8_t c) {
-//    ret->type = COMMAND_RETR;
-//    ret->n = 4;
-//    strncpy(ret->data, "RETR", 4);
-//}
-//
-//static void
-//command_dele(struct parser_event *ret, const uint8_t c) {
-//    ret->type = COMMAND_DELE;
-//    ret->n = 4;
-//    strncpy(ret->data, "DELE", 4);
-//}
-//
-//static void
-//command_noop(struct parser_event *ret, const uint8_t c) {
-//    ret->type = COMMAND_NOOP;
-//    ret->n = 4;
-//    strncpy(ret->data, "NOOP", 4);
-//}
-//
-//static void
-//command_rset(struct parser_event *ret, const uint8_t c) {
-//    ret->type = COMMAND_RSET;
-//    ret->n = 4;
-//    strncpy(ret->data, "RSET", 4);
-//}
-//
-//static void
-//command_top(struct parser_event *ret, const uint8_t c) {
-//
-//}
+////////////////////////////////////////////////////////////
+// FUNCTIONS DEBUG ONLY
 
-static void
-command_invalid(struct parser_event *ret, const uint8_t c) {
-    ret->type = EVENT_CMD_INVALID;
-    ret->n = 1;
-    ret->data[0] = c;
+void printAvailableCommandsNames (queue * q) {
+    log(DEBUG, "===========================================");
+    log(DEBUG, "Printing available commands in queue...");
+    queueIterator * it = newQueueIterator(q);
+    while (hasNext(it)) {
+        log(DEBUG, "name: %s", ((struct command_description *) next(it))->name);
+    }
+    free(it);
+    log(DEBUG, "===========================================");
 }
 
-static const struct parser_state_transition ST_S0_OK[] = {
-        {.when = 'U',     .dest = S1_CMD_USER,          .act1 = command_user,},
-        {.when = 'P',     .dest = S7_CMD_PASS,          .act1 = command_pass,},
-        {.when = ANY,     .dest = S16_CMD_INVALID,      .act1 = command_invalid,},
-};
-
-static const struct parser_state_transition ST_S1_CMD_USER[] = {
-        {.when = 'S',     .dest = S2_CMD_USER,          .act1 = command_user,},
-        {.when = ANY,     .dest = S16_CMD_INVALID,      .act1 = command_invalid,},
-};
-
-static const struct parser_state_transition ST_S2_CMD_USER[] = {
-        {.when = 'E',     .dest = S3_CMD_USER,          .act1 = command_user,},
-        {.when = ANY,     .dest = S16_CMD_INVALID,      .act1 = command_invalid,},
-};
-
-static const struct parser_state_transition ST_S3_CMD_USER[] = {
-        {.when = 'R',     .dest = S4_CMD_USER,          .act1 = command_user,},
-        {.when = ANY,     .dest = S16_CMD_INVALID,      .act1 = command_invalid,},
-};
-
-static const struct parser_state_transition ST_S4_CMD_USER[] = {
-        {.when = ' ',     .dest = S5_USERNAME,          .act1 = username,},
-        {.when = ANY,     .dest = S16_CMD_INVALID,      .act1 = command_invalid,},
-};
-
-static const struct parser_state_transition ST_S5_USERNAME[] = {
-        {.when = USERNAME_VALID_CHAR, .dest = S5_USERNAME,          .act1 = username,},
-        {.when = '\n',                .dest = S0_OK,                .act1 = st_ok,},
-        {.when = '\r',                .dest = S16_CMD_INVALID,      .act1 = command_invalid,},
-        {.when = ANY,                 .dest = S6_USERNAME_INVALID,  .act1 = username_invalid,},
-};
-
-static const struct parser_state_transition ST_S6_USERNAME_INVALID[] = {
-        {.when = ANY,     .dest = S6_USERNAME_INVALID,  .act1 = username_invalid,},
-};
-
-static const struct parser_state_transition ST_S7_CMD_PASS[] = {
-        {.when = 'A',     .dest = S8_CMD_PASS,          .act1 = command_pass,},
-        {.when = ANY,     .dest = S16_CMD_INVALID,      .act1 = command_invalid,},
-};
-
-static const struct parser_state_transition ST_S8_CMD_PASS[] = {
-        {.when = 'S',     .dest = S9_CMD_PASS,          .act1 = command_pass,},
-        {.when = ANY,     .dest = S16_CMD_INVALID,      .act1 = command_invalid,},
-};
-
-static const struct parser_state_transition ST_S9_CMD_PASS[] = {
-        {.when = 'S',     .dest = S10_CMD_PASS,         .act1 = command_pass,},
-        {.when = ANY,     .dest = S16_CMD_INVALID,      .act1 = command_invalid,},
-};
-
-static const struct parser_state_transition ST_S10_CMD_PASS[] = {
-        {.when = ' ',     .dest = S11_PWD,              .act1 = pwd,},
-        {.when = ANY,     .dest = S16_CMD_INVALID,      .act1 = command_invalid,},
-};
-
-static const struct parser_state_transition ST_S11_PWD[] = {
-        {.when = PWD_VALID_CHAR,    .dest = S11_PWD,              .act1 = pwd,},
-        {.when = '\n',              .dest = S0_OK,                .act1 = st_ok,},
-        {.when = '\r',              .dest = S16_CMD_INVALID,      .act1 = command_invalid,},
-        {.when = ANY,               .dest = S12_PWD_INVALID,      .act1 = pwd_invalid,},
-};
-
-static const struct parser_state_transition ST_S12_PWD_INVALID[] = {
-        {.when = ANY,        .dest = S12_PWD_INVALID,      .act1 = pwd_invalid,},
-};
-
-//static const struct parser_state_transition ST_S13[] = {
-//        {.when = ANY, .dest = S10, .act1 = command_stat,},
-//};
-//
-//static const struct parser_state_transition ST_S14[] = {
-//        {.when = 'I', .dest = S10, .act1 = command_list,},
-//};
-//
-//static const struct parser_state_transition ST_S15[] = {
-//        {.when = 'I', .dest = S10, .act1 = command_list,},
-//};
-//
-static const struct parser_state_transition ST_S16_CMD_INVALID[] = {
-        {.when = ANY,  .dest = S16_CMD_INVALID,  .act1 = command_invalid,},
-};
-
-static const struct parser_state_transition *states[] = {
-        ST_S0_OK,
-        ST_S1_CMD_USER,
-        ST_S2_CMD_USER,
-        ST_S3_CMD_USER,
-        ST_S4_CMD_USER,
-        ST_S5_USERNAME,
-        ST_S6_USERNAME_INVALID,
-        ST_S7_CMD_PASS,
-        ST_S8_CMD_PASS,
-        ST_S9_CMD_PASS,
-        ST_S10_CMD_PASS,
-        ST_S11_PWD,
-        ST_S12_PWD_INVALID,
-//        ST_S13,
-//        ST_S14,
-//        ST_S15,
-        ST_S16_CMD_INVALID,
-};
-
-static const size_t states_n[] = {
-        N(ST_S0_OK),
-        N(ST_S1_CMD_USER),
-        N(ST_S2_CMD_USER),
-        N(ST_S3_CMD_USER),
-        N(ST_S4_CMD_USER),
-        N(ST_S5_USERNAME),
-        N(ST_S6_USERNAME_INVALID),
-        N(ST_S7_CMD_PASS),
-        N(ST_S8_CMD_PASS),
-        N(ST_S9_CMD_PASS),
-        N(ST_S10_CMD_PASS),
-        N(ST_S11_PWD),
-        N(ST_S12_PWD_INVALID),
-//        N(ST_S13),
-//        N(ST_S14),
-//        N(ST_S15),
-        N(ST_S16_CMD_INVALID),
-};
-
-// Parser definintion
-struct parser_definition cmd_parser_definition = {
-        .states_count = N(states),
-        .states       = states,
-        .states_n     = states_n,
-        .start_state  = S0_OK,
-};
+void printParsedCommandsNames (queue * q) {
+    log(DEBUG, "===========================================");
+    log(DEBUG, "Printing parsed commands in queue...");
+    queueIterator * it = newQueueIterator(q);
+    while (hasNext(it)) {
+        struct command *cmd = ((struct command *) next(it));
+        log(DEBUG, "name: %s", cmd->description->name);
+        log(DEBUG, "args: %s", cmd->args);
+    }
+    free(it);
+    log(DEBUG, "===========================================");
+}

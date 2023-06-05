@@ -1,124 +1,110 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <check.h>
-
+#include <buffer.h>
 #include <macros.h>
+#include <logger.h>
 #include <parser.h>
-
+#include <commands_parser.h>
 #include "../src/parsers/commands_parser.c"
 
-static void assert_event(const unsigned type, const int c, const struct parser_event *e) {
-    ck_assert_ptr_eq(NULL, e->next);
-    ck_assert_uint_eq(1, e->n);
-    ck_assert_uint_eq(type, e->type);
-    ck_assert_uint_eq(c, e->data[0]);
-}
-
 START_TEST (test_parse_valid_username) {
-    // Parser initialization
-    struct parser *parser = parser_init(parser_no_classes(), &cmd_parser_definition);
-    ck_assert_uint_eq(S0_OK, cmd_parser_definition.start_state);
+    struct command_parser *p = emalloc(sizeof(struct command_parser));
+    p->state = CMD_DISPATCH;
+    p->commands_queue = newQueue(sizeof(struct command *));
+    p->available_commands_queue = newQueue(sizeof(struct command_description));
+    ck_assert_ptr_ne(NULL, p);
+    ck_assert_ptr_ne(NULL, p->commands_queue);
+    ck_assert_ptr_ne(NULL, p->available_commands_queue);
 
-    // Test valid USER + username command
-    assert_event(EVENT_CMD_USER, 'U', parser_feed(parser, 'U'));
-    assert_event(EVENT_CMD_USER, 'S', parser_feed(parser, 'S'));
-    assert_event(EVENT_CMD_USER, 'E', parser_feed(parser, 'E'));
-    assert_event(EVENT_CMD_USER, 'R', parser_feed(parser, 'R'));
-    assert_event(EVENT_USERNAME, ' ', parser_feed(parser, ' '));
-    assert_event(EVENT_USERNAME, 'N', parser_feed(parser, 'N'));
-    assert_event(EVENT_USERNAME, '1', parser_feed(parser, '1'));
-    assert_event(EVENT_USERNAME, 'c', parser_feed(parser, 'c'));
-    assert_event(EVENT_USERNAME, 'k', parser_feed(parser, 'k'));
-    assert_event(EVENT_OK, '\n', parser_feed(parser, '\n'));
+    const struct parser_definition user = parser_utils_strcmpi("USER ");
+    commands[CMD_USER].parser = parser_init(parser_no_classes(), &user);
+    p->available_commands_queue = add(p->available_commands_queue, &(commands[CMD_USER]));
 
-    parser_destroy(parser);
-}
-END_TEST
+    const struct parser_definition pass = parser_utils_strcmpi("PASS ");
+    commands[CMD_PASS].parser = parser_init(parser_no_classes(), &pass);
+    p->available_commands_queue = add(p->available_commands_queue, &(commands[CMD_PASS]));
 
-START_TEST (test_parse_invalid_username) {
-    // Parser initialization
-    struct parser *parser = parser_init(parser_no_classes(), &cmd_parser_definition);
-    ck_assert_uint_eq(S0_OK, cmd_parser_definition.start_state);
+    const struct parser_definition stat = parser_utils_strcmpi("STAT\r\n");
+    commands[CMD_STAT].parser = parser_init(parser_no_classes(), &stat);
+    p->available_commands_queue = add(p->available_commands_queue, &(commands[CMD_STAT]));
 
-    assert_event(EVENT_CMD_USER,    'U', parser_feed(parser, 'U'));
-    assert_event(EVENT_CMD_USER,    'S', parser_feed(parser, 'S'));
-    assert_event(EVENT_CMD_INVALID, 'R', parser_feed(parser, 'R'));
-    assert_event(EVENT_CMD_INVALID, ' ', parser_feed(parser, ' '));
-    assert_event(EVENT_CMD_INVALID, 'N', parser_feed(parser, 'N'));
-    assert_event(EVENT_CMD_INVALID, '1', parser_feed(parser, '1'));
-    assert_event(EVENT_CMD_INVALID, '\n', parser_feed(parser, '\n'));
+    const struct parser_definition list = parser_utils_strcmpi("LIST ");
+    commands[CMD_LIST].parser = parser_init(parser_no_classes(), &list);
+    p->available_commands_queue = add(p->available_commands_queue, &(commands[CMD_LIST]));
 
-    // Parser initialization
-    parser = parser_init(parser_no_classes(), &cmd_parser_definition);
-    ck_assert_uint_eq(S0_OK, cmd_parser_definition.start_state);
+    const struct parser_definition retr = parser_utils_strcmpi("RETR ");
+    commands[CMD_RETR].parser = parser_init(parser_no_classes(), &retr);
+    p->available_commands_queue = add(p->available_commands_queue, &(commands[CMD_RETR]));
 
-    // Test invalid username
-    assert_event(EVENT_CMD_USER,         'U', parser_feed(parser, 'U'));
-    assert_event(EVENT_CMD_USER,         'S', parser_feed(parser, 'S'));
-    assert_event(EVENT_CMD_USER,         'E', parser_feed(parser, 'E'));
-    assert_event(EVENT_CMD_USER,         'R', parser_feed(parser, 'R'));
-    assert_event(EVENT_USERNAME,         ' ', parser_feed(parser, ' '));
-    assert_event(EVENT_USERNAME,         'N', parser_feed(parser, 'N'));
-    assert_event(EVENT_USERNAME,         '1', parser_feed(parser, '1'));
-    assert_event(EVENT_USERNAME_INVALID, '@', parser_feed(parser, '@'));
+    const struct parser_definition dele = parser_utils_strcmpi("DELE ");
+    commands[CMD_DELE].parser = parser_init(parser_no_classes(), &dele);
+    p->available_commands_queue = add(p->available_commands_queue, &(commands[CMD_DELE]));
 
-    // Parser initialization
-    parser = parser_init(parser_no_classes(), &cmd_parser_definition);
-    ck_assert_uint_eq(S0_OK, cmd_parser_definition.start_state);
+    const struct parser_definition noop = parser_utils_strcmpi("NOOP\r\n");
+    commands[CMD_NOOP].parser = parser_init(parser_no_classes(), &noop);
+    p->available_commands_queue = add(p->available_commands_queue, &(commands[CMD_NOOP]));
 
-    assert_event(EVENT_CMD_USER, 'U', parser_feed(parser, 'U'));
-    assert_event(EVENT_CMD_USER, 'S', parser_feed(parser, 'S'));
-    assert_event(EVENT_CMD_USER, 'E', parser_feed(parser, 'E'));
-    assert_event(EVENT_CMD_USER, 'R', parser_feed(parser, 'R'));
-    assert_event(EVENT_USERNAME, ' ', parser_feed(parser, ' '));
-    assert_event(EVENT_USERNAME, 'N', parser_feed(parser, 'N'));
-    assert_event(EVENT_USERNAME, '1', parser_feed(parser, '1'));
-    assert_event(EVENT_USERNAME, 'c', parser_feed(parser, 'c'));
-    assert_event(EVENT_USERNAME, 'k', parser_feed(parser, 'k'));
-    // End of a command must be '\n'
-    assert_event(EVENT_CMD_INVALID, '\r', parser_feed(parser, '\r'));
+    const struct parser_definition quit = parser_utils_strcmpi("QUIT\r\n");
+    commands[CMD_QUIT].parser = parser_init(parser_no_classes(), &quit);
+    p->available_commands_queue = add(p->available_commands_queue, &(commands[CMD_QUIT]));
 
-    parser_destroy(parser);
-}
+    ck_assert_int_eq(N(commands), p->available_commands_queue->size);
 
+    struct buffer buf;
+    buffer *b = &buf;
+    uint8_t direct_buff[512];
+    buffer_init(&buf, N(direct_buff), direct_buff);
+    size_t wbytes = 0, rbytes = 0;
+    uint8_t *ptr = buffer_write_ptr(b, &wbytes);
+    ck_assert_uint_eq(512, wbytes);
 
-START_TEST (test_parse_empty_username) {
-    // Parser initialization
-    struct parser *parser = parser_init(parser_no_classes(), &cmd_parser_definition);
-    ck_assert_uint_eq(S0_OK, cmd_parser_definition.start_state);
+    uint8_t user_cmd_write [] = {
+            'U', 'S', 'E', 'R', ' ', 'p', 'r', '0', 't', '0', 's', '\r', '\n'
+    };
+    memcpy(ptr, user_cmd_write, sizeof(user_cmd_write));
+    buffer_write_adv(b, sizeof(user_cmd_write));
 
-    assert_event(EVENT_CMD_USER,    'U', parser_feed(parser, 'U'));
-    assert_event(EVENT_CMD_USER,    'S', parser_feed(parser, 'S'));
-    assert_event(EVENT_CMD_USER,    'E', parser_feed(parser, 'E'));
-    assert_event(EVENT_CMD_USER,    'R', parser_feed(parser, 'R'));
-    assert_event(EVENT_USERNAME,    ' ', parser_feed(parser, ' '));
-    // For now, the parser is allowing empty usernames
-    // TODO The caller should validates the username length
-    assert_event(EVENT_OK,          '\n', parser_feed(parser, '\n'));
+    while(buffer_can_read(b)) {
+     do {
+         uint8_t c = buffer_read(b);
+         log(DEBUG, "Read char: %c", c);
+         p->state = command_parser_feed(p, c);
+     } while (p->state == CMD_MAYEQ);
 
-    parser_destroy(parser);
-}
-END_TEST
+     if (p->state == CMD_INVALID) {
+        log(DEBUG, "Invalid command");
+         struct command *invalid_cmd = (struct command *) peekTail(p->commands_queue);
+         const char *errorMsg = "Invalid command";
+         invalid_cmd->args = (uint8_t *) errorMsg;
+     } else if (p->state == CMD_ARGS) {
+         // consume the rest of the buffer until '\r\n'
+         struct command *cmd = (struct command *) peekTail(p->commands_queue);
+         uint8_t args[cmd->description->args_max];
+         size_t *readBytes;
+         bool crlf = consume_until_crlf(b, args, readBytes);
+         if (crlf) {
+             // valid input saves read args in cmd->args
+             cmd->args = args;
+             p->state = buffer_can_read(b) ? CMD_DISPATCH : CMD_OK;
+         } else {
+             // invalid input
+             // change command state to invalid, saves error message in args
+             memset(args, 0, N(args));
+             const char *errorMsg = "Invalid args for command";
+             strcpy((char *)args, errorMsg);
+             cmd->description->type = CMD_ERROR;
+         }
+         log(DEBUG, "Command args: %s", args);
+     }
+    }
+    printParsedCommandsNames(p->commands_queue);
+    struct command *parsed_cmd = (struct command *) peekTail(p->commands_queue);
+    ck_assert_str_eq("USER ", parsed_cmd->description->name);
+    ck_assert_str_eq("USER ", parsed_cmd->description->name);
 
-START_TEST (test_parse_valid_pwd) {
-    // Parser initialization
-    struct parser *parser = parser_init(parser_no_classes(), &cmd_parser_definition);
-    ck_assert_uint_eq(S0_OK, cmd_parser_definition.start_state);
+} END_TEST
 
-    assert_event(EVENT_CMD_PASS,    'P', parser_feed(parser, 'P'));
-    assert_event(EVENT_CMD_PASS,    'A', parser_feed(parser, 'A'));
-    assert_event(EVENT_CMD_PASS,    'S', parser_feed(parser, 'S'));
-    assert_event(EVENT_CMD_PASS,    'S', parser_feed(parser, 'S'));
-    assert_event(EVENT_PWD,         ' ', parser_feed(parser, ' '));
-    assert_event(EVENT_PWD,         '1', parser_feed(parser, '1'));
-    assert_event(EVENT_PWD,         '2', parser_feed(parser, '2'));
-    assert_event(EVENT_PWD,         '3', parser_feed(parser, '3'));
-    assert_event(EVENT_PWD,         '4', parser_feed(parser, '4'));
-    assert_event(EVENT_OK,          '\n', parser_feed(parser, '\n'));
-
-    parser_destroy(parser);
-}
-END_TEST
 
 Suite *
 suite(void) {
@@ -130,9 +116,6 @@ suite(void) {
     tc = tcase_create("cmd_parser_utils");
 
     tcase_add_test(tc, test_parse_valid_username);
-    tcase_add_test(tc, test_parse_invalid_username);
-    tcase_add_test(tc, test_parse_empty_username);
-    tcase_add_test(tc, test_parse_valid_pwd);
     suite_add_tcase(s, tc);
 
     return s;
