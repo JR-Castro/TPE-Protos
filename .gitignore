@@ -50,3 +50,33 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Jetbrains
+.idea
+*.iml
+# MacOS
+.DS_Store
+
+# CMake Folder
+build/
+cmake-build-debug
+test/cmake-build-debug
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+test/CMakeFiles
+src/CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+DartConfiguration.tcl
+# GDB History
+.gdb_history
+
+# Valgrind output file
+valgrind-output.txt
