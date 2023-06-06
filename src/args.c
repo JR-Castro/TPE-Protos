@@ -7,6 +7,8 @@
 
 #include "include/args.h"
 
+struct pop3_args pop3_args;
+
 static unsigned short
 port(const char *s) {
     char *end     = 0;
