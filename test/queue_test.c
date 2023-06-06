@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <check.h>
-#include <queue.h>
+#include "queue.h"
 
 START_TEST (integration_test_queue) {
     queue * q = newQueue(sizeof(int));

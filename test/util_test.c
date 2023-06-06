@@ -1,7 +1,7 @@
 #include <check.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <util.h>
+#include "util.h"
 
 
 START_TEST (test_is_alphanum) {
@@ -70,7 +70,7 @@ suite(void) {
 
     s = suite_create("util_tests");
 
-    /* Core test case */
+    /* Core tests case */
     tc = tcase_create("util_tests");
 
     tcase_add_test(tc, test_is_alphanum);

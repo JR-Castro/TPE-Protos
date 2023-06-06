@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <check.h>
-#include <buffer.h>
-#include <macros.h>
-#include <logger.h>
-#include <parser.h>
-#include <commands_parser.h>
+#include "buffer.h"
+#include "macros.h"
+#include "logger.h"
+#include "parser.h"
+#include "commands_parser.h"
 #include "../src/parsers/commands_parser.c"
 
 START_TEST (test_parse_valid_username) {

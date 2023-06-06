@@ -1,1 +1,0 @@
-/usr/bin/cc -g  -rdynamic CMakeFiles/pop3server.dir/parsers/commands_parser.c.o CMakeFiles/pop3server.dir/parsers/parser.c.o CMakeFiles/pop3server.dir/util.c.o  -o pop3server  -lpthread -lsctp 

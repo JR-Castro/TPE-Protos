@@ -2,21 +2,18 @@
 #include <stdlib.h>
 #include <check.h>
 
-#include <macros.h>
-#include <parser.h>
+#include "parser.h"
 
 // definición de maquina
 
 enum states {
     S0,
-    S1,
+    S1
 };
 
 enum event_type {
     FOO,
     BAR,
-    USERNAME,
-    PWD,
 };
 
 static void
@@ -33,48 +30,34 @@ bar(struct parser_event *ret, const uint8_t c) {
     ret->data[0] = c;
 }
 
-static void
-username(struct parser_event *ret, const uint8_t c) {
-    ret->type    = USERNAME;
-    ret->n       = 1;
-    ret->data[0] = c;
-}
-
-static void
-pwd(struct parser_event *ret, const uint8_t c) {
-    ret->type    = PWD;
-    ret->n       = 1;
-    ret->data[0] = c;
-}
-
 static const struct parser_state_transition ST_S0 [] =  {
-    {.when = 'F',                        .dest = S0,        .act1 = foo,},
-    {.when = 'f',                        .dest = S0,        .act1 = foo,},
-    {.when = USERNAME_VALID_CHAR,        .dest = S0,        .act1 = username,},
-    {.when = ANY,                        .dest = S1,        .act1 = bar,},
+        {.when = 'F',        .dest = S0,        .act1 = foo,},
+        {.when = 'f',        .dest = S0,        .act1 = foo,},
+        {.when = ANY,        .dest = S1,        .act1 = bar,},
 };
 static const struct parser_state_transition ST_S1 [] =  {
-    {.when = 'F',                   .dest = S0,        .act1 = foo,},
-    {.when = 'f',                   .dest = S0,        .act1 = foo,},
-    {.when = PWD_VALID_CHAR,        .dest = S1,        .act1 = pwd,},
-    {.when = ANY,                   .dest = S1,        .act1 = bar,},
+        {.when = 'F',        .dest = S0,        .act1 = foo,},
+        {.when = 'f',        .dest = S0,        .act1 = foo,},
+        {.when = ANY,        .dest = S1,        .act1 = bar,},
 };
 
 static const struct parser_state_transition *states [] = {
-    ST_S0,
-    ST_S1,
+        ST_S0,
+        ST_S1,
 };
 
+#define N(x) (sizeof(x)/sizeof((x)[0]))
+
 static const size_t states_n [] = {
-    N(ST_S0),
-    N(ST_S1),
+        N(ST_S0),
+        N(ST_S1),
 };
 
 static struct parser_definition definition = {
-    .states_count = N(states),
-    .states       = states,
-    .states_n     = states_n,
-    .start_state  = S0,
+        .states_count = N(states),
+        .states       = states,
+        .states_n     = states_n,
+        .start_state  = S0,
 };
 
 //// TEST
@@ -90,18 +73,10 @@ assert_eq(const unsigned type, const int c, const struct parser_event *e) {
 
 START_TEST (test_basic) {
     struct parser *parser = parser_init(parser_no_classes(), &definition);
-    assert_eq(FOO,       'f', parser_feed(parser, 'f'));
-    assert_eq(FOO,       'F', parser_feed(parser, 'F'));
-    assert_eq(USERNAME,  'B', parser_feed(parser, 'B'));
-    assert_eq(USERNAME,  'b', parser_feed(parser, 'b'));
-    assert_eq(BAR,       '$', parser_feed(parser, '$'));
-    assert_eq(PWD,       '$', parser_feed(parser, '$'));
-    assert_eq(PWD,       '5', parser_feed(parser, '5'));
-    assert_eq(PWD,       'P', parser_feed(parser, 'P'));
-    assert_eq(PWD,       'w', parser_feed(parser, 'w'));
-    assert_eq(PWD,       'D', parser_feed(parser, 'D'));
-    assert_eq(PWD,       '#', parser_feed(parser, '#'));
-    assert_eq(BAR,       '?', parser_feed(parser, '?'));
+    assert_eq(FOO,  'f', parser_feed(parser, 'f'));
+    assert_eq(FOO,  'F', parser_feed(parser, 'F'));
+    assert_eq(BAR,  'B', parser_feed(parser, 'B'));
+    assert_eq(BAR,  'b', parser_feed(parser, 'b'));
 
     parser_destroy(parser);
 }
@@ -137,4 +112,3 @@ main(void) {
     srunner_free(sr);
     return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
-
