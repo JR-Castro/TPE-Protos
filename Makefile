@@ -4,7 +4,7 @@ LDFLAGS= -pthread
 
 INCLUDE=-I src/include
 
-SOURCES=src/buffer.c src/main.c src/netutils.c src/parser.c src/parser_utils.c src/selector.c src/stm.c src/pop3.c
+SOURCES=src/buffer.c src/main.c src/netutils.c src/parser.c src/parser_utils.c src/selector.c src/stm.c src/pop3.c src/args.c
 OBJECTS=$(SOURCES:.c=.o)
 
 TESTS=tests/buffer_test.c tests/netutils_test.c tests/parser_test.c tests/parser_utils_test.c tests/selector_test.c tests/stm_test.c

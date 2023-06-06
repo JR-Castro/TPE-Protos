@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 #include "include/selector.h"
-#include "pop3.h"
+#include "include/pop3.h"
 #include "include/args.h"
 
 #define SERVICE "pop3"
@@ -32,9 +32,10 @@ int main(const int argc, char **argv) {
 
     int ret = 0;
 
-//    parse_args(argc, argv, &pop3_args);
+    parse_args(argc, argv, &pop3_args);
 
     close(STDIN_FILENO);
+
     signal(SIGTERM, sigterm_handler);
     signal(SIGINT, sigterm_handler);
 

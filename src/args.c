@@ -93,14 +93,16 @@ void parse_args(const int argc, char **argv, struct pop3_args *args) {
                 exit(1);
 
             }
-        }
-        if (optind < argc - 1)) {
-            fprintf(stderr, "Argument not accepted: ");
-            while (optind < argc - 1)
-            {
-                fprintf(stderr, "%s ", argv[optind++]);
-            }
-            fprintf(stderr, "\n");
-            exit(1);
-        }
     }
+
+
+    if (optind < argc - 1) {
+        fprintf(stderr, "Argument not accepted: ");
+        while (optind < argc - 1)
+        {
+            fprintf(stderr, "%s ", argv[optind++]);
+        }
+        fprintf(stderr, "\n");
+        exit(1);
+    }
+}

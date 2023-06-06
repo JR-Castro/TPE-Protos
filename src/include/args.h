@@ -12,7 +12,7 @@ struct pop3_args {
 
     char * mng_addr;
     unsigned short mng_port;
-};
+}pop3_args;
 
 /**
  * Interpreta la linea de comandos (argc, argv) llenando
