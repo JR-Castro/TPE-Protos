@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <macros.h>
 #include <queue.h>
+#include "buffer.h"
 
 enum command_type {
     CMD_USER,

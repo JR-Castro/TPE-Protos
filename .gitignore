@@ -56,6 +56,7 @@ dkms.conf
 *.iml
 
 # CMake Folder
+*.cbp
 build/
 cmake-build-debug
 test/cmake-build-debug
@@ -73,8 +74,12 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 DartConfiguration.tcl
+.cmake
+.PVS-Studio
 # GDB History
 .gdb_history
 
 # Valgrind output file
 valgrind-output.txt
+
+.idea
