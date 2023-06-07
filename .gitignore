@@ -61,7 +61,7 @@ cmake-build-debug
 test/cmake-build-debug
 CMakeLists.txt.user
 CMakeCache.txt
-CMakeFiles
+CMakeFiles/
 test/CMakeFiles
 src/CMakeFiles
 CMakeScripts

@@ -10,4 +10,7 @@
       <file path="$PROJECT_DIR$/test" />
     </sourceRoots>
   </component>
+  <component name="MakefileWorkspace">
+    <contentRoot DIR="$PROJECT_DIR$" />
+  </component>
 </project>
