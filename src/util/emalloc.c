@@ -1,5 +1,5 @@
-#include <emalloc.h>
-#include <logger.h>
+#include "emalloc.h"
+#include "logger.h"
 
 void * emalloc (size_t length) {
     void * memory = malloc (length);

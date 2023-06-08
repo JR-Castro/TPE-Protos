@@ -5,174 +5,121 @@
 #include <emalloc.h>
 
 ////////////////////////////////////////////////////////////
-// STATIC PROTOTYPES
-struct command_parser * command_parser_init();
+// STATIC FUNCTIONS
+/**
+ * @brief feed one byte to the parser and return the next state
+ *  CMD_DISPATCH: initial state, parsing command name
+ *  CMD_ARGS:     parsing command arguments
+ *  CMD_CRLF:     parsing CRLF, end of argument
+ *  CMD_OK:       command parsed successfully
+ *  CMD_INVALID:  command not recognized, no CRLF was found
+ * @param p: ptr to command_parser struct
+ * @param c: byte to feed
+ * @param index: ptr to the byte in the buffer
+ * @return next state after parsing the byte
+ */
+static enum command_state command_parser_feed(struct command_parser *p, uint8_t c);
 
-static queue * available_commands_queue_init (struct command_parser *p);
+static void reset_command_parser(struct command_parser *p) {
+    p->bytes = 0;
+    p->command->args1 = p->command->args2 = NULL;
+}
 
-static struct command * newCommand (struct command_description * desc);
+// For debug only
+static void printCommand(struct command_parser *p);
 
 ////////////////////////////////////////////////////////////
 // FUNCTIONS
-
-bool compareElements (void * a, void * b) {
-    return ((struct command_description *) a)->name == ((struct command_description *) b)->name;
-}
-
 struct command_parser * command_parser_init() {
     log(DEBUG, "Initializing command parser...");
     struct command_parser *p = emalloc(sizeof(struct command_parser));
-    p->state = CMD_DISPATCH;
-    p->commands_queue = newQueue(sizeof(struct command));
-    p->available_commands_queue = available_commands_queue_init(p);
-
+    p->state = p->prev_state = CMD_DISPATCH;
+    p->bytes = 0;
+    p->command = emalloc(sizeof(struct command));
+    p->command->args1 = p->command->args2 = NULL;
     log(DEBUG, "command parser initialization DONE!");
     return p;
 }
 
-static queue * available_commands_queue_init(struct command_parser *p) {
-    log(DEBUG, "Initializing available commands queue...");
-    queue * q = newQueue(sizeof(struct command_description));
-
-//    for (int i = 0; i < N(commands); i++) {
-//        const struct parser_definition def = parser_utils_strcmpi(commands[i].name);
-//        commands[i].parser = parser_init(parser_no_classes(), &def);
-//        q = add(q, &(commands[i]));
-//    }
-
-    // tried to use a for loop, but it didn't work. Complained about const assignment.
-    // Weird! so I'm using this ugly code instead.
-    const struct parser_definition user = parser_utils_strcmpi("USER ");
-    commands[CMD_USER].parser = parser_init(parser_no_classes(), &user);
-    q = add(q, &(commands[CMD_USER]));
-
-    const struct parser_definition pass = parser_utils_strcmpi("PASS ");
-    commands[CMD_PASS].parser = parser_init(parser_no_classes(), &pass);
-    q = add(q, &(commands[CMD_PASS]));
-
-    const struct parser_definition stat = parser_utils_strcmpi("STAT\r\n");
-    commands[CMD_STAT].parser = parser_init(parser_no_classes(), &stat);
-    q = add(q, &(commands[CMD_STAT]));
-
-    const struct parser_definition list = parser_utils_strcmpi("LIST ");
-    commands[CMD_LIST].parser = parser_init(parser_no_classes(), &list);
-    q = add(q, &(commands[CMD_LIST]));
-
-    const struct parser_definition retr = parser_utils_strcmpi("RETR ");
-    commands[CMD_RETR].parser = parser_init(parser_no_classes(), &retr);
-    q = add(q, &(commands[CMD_RETR]));
-
-    const struct parser_definition dele = parser_utils_strcmpi("DELE ");
-    commands[CMD_DELE].parser = parser_init(parser_no_classes(), &dele);
-    q = add(q, &(commands[CMD_DELE]));
-
-    const struct parser_definition noop = parser_utils_strcmpi("NOOP\r\n");
-    commands[CMD_NOOP].parser = parser_init(parser_no_classes(), &noop);
-    q = add(q, &(commands[CMD_NOOP]));
-
-    const struct parser_definition quit = parser_utils_strcmpi("QUIT\r\n");
-    commands[CMD_QUIT].parser = parser_init(parser_no_classes(), &quit);
-    q = add(q, &(commands[CMD_QUIT]));
-
-    p->available_commands_queue = q;
-    log(DEBUG, "available commands queue initialization DONE!");
-
-    return p->available_commands_queue;
-}
-
-enum command_state command_parser_feed(struct command_parser *p, uint8_t c) {
-    enum command_state next_state = CMD_DISPATCH;
-
-    // Iterating over commands array
-    for (int i = 0; i < N(commands); i++) {
-        if (!commands[i].active) {
-            continue;
-        }
-        struct parser *cmd_parser = commands[i].parser;
-        const struct parser_event *event = parser_feed(cmd_parser, c);
-        if (event->type == STRING_CMP_EQ) {
-            log(DEBUG, "Command matched: %s", commands[i].name);
-            p->commands_queue = add(p->commands_queue, newCommand(&(commands[i])));
-            // active all parser for next iteration
-            for (int i = 0; i < N(commands); i++) {
-                commands[i].active = true;
+static enum command_state command_parser_feed(struct command_parser *p, uint8_t c) {
+    p->command->data[p->bytes] = c;
+    p->bytes++;
+    switch (p->state) {
+        case CMD_DISPATCH:
+            if (c == ' ') {
+                p->prev_state = p->state;
+                p->state = CMD_ARGS;
+                p->command->data[p->bytes-1] = '\0';
+            } else if (c == '\r') {
+                p->state = CMD_CRLF;
+                p->command->data[p->bytes-1] = '\0';
             }
-            next_state = CMD_ARGS;
             break;
-        } else if (event->type == STRING_CMP_MAYEQ) {
-            log(DEBUG, "may matched: %s", commands[i].name);
-            next_state = CMD_MAYEQ;
-        } else {
-            log(DEBUG, "Command did not matched: %s", commands[i].name);
-            commands[i].active = false;
-        }
-    }
-    if (next_state == CMD_DISPATCH) {
-        log(DEBUG, "No command matched");
-        struct command_description * invalid_cmd = emalloc(sizeof(struct command_description));
-        invalid_cmd->name = "INVALID";
-        invalid_cmd->type = CMD_INVALID;
-        p->commands_queue = add(p->commands_queue, newCommand(invalid_cmd));
-        next_state = CMD_INVALID;
+        case CMD_CRLF:
+            p->state = (c == '\n')
+                     ? (p->prev_state == CMD_INVALID) ? CMD_DISPATCH : CMD_OK
+                     : CMD_INVALID;
+            // reset parser after
+            if (p->state == CMD_DISPATCH) {
+                reset_command_parser(p);
+            } else if (p->state == CMD_OK) {
+                p->command->data[p->bytes-2] = '\0';
+            }
+            p->prev_state = CMD_CRLF;
+            break;
+        case CMD_ARGS:
+            if (c != ' ' && c != '\t' && c != '\r'
+                && p->prev_state == CMD_DISPATCH) {
+                // first char after one or more spaces
+                if (p->command->args1 == NULL) {
+                    p->command->args1 = &(p->command->data[p->bytes-1]);
+                } else {
+                    p->command->args2 = &(p->command->data[p->bytes-1]);
+                }
+                p->prev_state = CMD_ARGS;
+            } else if (c == ' ' && p->prev_state == CMD_ARGS) {
+                // space for second argument
+                p->prev_state = CMD_DISPATCH;
+                p->command->data[p->bytes-1] = '\0';
+            } else if (c == '\r') {
+                p->prev_state = CMD_ARGS;
+                p->state = CMD_CRLF;
+            }
+            break;
+        case CMD_INVALID:
+            p->prev_state = CMD_INVALID;
+            p->state = (c == '\r') ? CMD_CRLF : CMD_INVALID;
+            break;
     }
 
-    return next_state;
+    return p->state;
 }
 
-bool consume_until_crlf (buffer *b, uint8_t *ret, size_t *n) {
-    bool crlf = false;
-    size_t i = 0;
-    while (buffer_can_read(b)) {
-        ret[i++] = buffer_read(b);
-        if (i > 2 && ret[i-1] == '\n' && ret[i-2] == '\r') {
-            log(DEBUG, "Found CRLF")
-            crlf = true;
-            ret[i-2] = '\0';
-            break;
-        }
+enum command_state parse_byte_command(buffer *inputBuffer, struct command_parser *p) {
+    enum command_state state = p->state;
+    if (buffer_can_read(inputBuffer)) {
+        state = command_parser_feed(p, buffer_read(inputBuffer));
     }
-    size_t readBytes = i-1;
-    n = &readBytes;
-    log(DEBUG, "[consume_until_crlf] ret: %s, readBytes: %zu", ret, *n)
-    return crlf;
+
+    return state;
 }
 
 void command_parser_destroy(struct command_parser *p) {
-   // TODO
+    log(DEBUG, "Destroying command parser...");
+    free(p->command);
+    free(p);
+    log(DEBUG, "command parser destruction DONE!");
 }
 
-static struct command * newCommand (struct command_description * desc) {
-    struct command * cmd = emalloc(sizeof(struct command));
-    cmd->description = emalloc(sizeof(struct command_description));
-    cmd->description = desc;
-    cmd->args = NULL;
-
-    return cmd;
-}
-
-////////////////////////////////////////////////////////////
-// FUNCTIONS DEBUG ONLY
-
-void printAvailableCommandsNames (queue * q) {
-    log(DEBUG, "===========================================");
-    log(DEBUG, "Printing available commands in queue...");
-    queueIterator * it = newQueueIterator(q);
-    while (hasNext(it)) {
-        log(DEBUG, "name: %s", ((struct command_description *) next(it))->name);
+/** FOR DEBUG ONLY */
+static void printCommand(struct command_parser *p) {
+    printf("=== PARSED DATA ===\n");
+    printf("command_name: %s\n", p->command->data);
+    printf("arg1: %s\n", p->command->args1);
+    printf("arg2: %s\n", p->command->args2);
+    printf("=== MEM DUMP ===\n");
+    for (int i = 0; i < p->bytes; i++) {
+        printf("%c (%p)\n", p->command->data[i], &(p->command->data[i]));
     }
-    free(it);
-    log(DEBUG, "===========================================");
-}
-
-void printParsedCommandsNames (queue * q) {
-    log(DEBUG, "===========================================");
-    log(DEBUG, "Printing parsed commands in queue...");
-    queueIterator * it = newQueueIterator(q);
-    while (hasNext(it)) {
-        struct command *cmd = ((struct command *) next(it));
-        log(DEBUG, "name: %s", cmd->description->name);
-        log(DEBUG, "args: %s", cmd->args);
-    }
-    free(it);
-    log(DEBUG, "===========================================");
+    printf("===================\n");
 }

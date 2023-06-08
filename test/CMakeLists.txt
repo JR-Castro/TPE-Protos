@@ -18,9 +18,9 @@ include_directories(../src/include)
 add_executable(
         queue_test
         ${CTEST_SOURCE_DIRECTORY}/queue_test.c
-        ${CTEST_SOURCE_DIRECTORY}/../src/logger.c
-        ${CTEST_SOURCE_DIRECTORY}/../src/emalloc.c
-        ${CTEST_SOURCE_DIRECTORY}/../src/queue.c)
+        ${CTEST_SOURCE_DIRECTORY}/../src/util/logger.c
+        ${CTEST_SOURCE_DIRECTORY}/../src/util/emalloc.c
+        ${CTEST_SOURCE_DIRECTORY}/../src/util/queue.c)
 target_link_libraries(queue_test check subunit rt m)
 add_test(NAME queue_test COMMAND queue_test)
 
@@ -28,7 +28,7 @@ add_test(NAME queue_test COMMAND queue_test)
 add_executable(
         parser_test
         ${CTEST_SOURCE_DIRECTORY}/parser_test.c
-        ${CTEST_SOURCE_DIRECTORY}/../src/util.c
+        ${CTEST_SOURCE_DIRECTORY}/../src/util/util.c
         ${CTEST_SOURCE_DIRECTORY}/../src/parsers/parser.c)
 target_link_libraries(parser_test check subunit rt m)
 add_test(NAME parser_test COMMAND parser_test)
@@ -37,7 +37,7 @@ add_test(NAME parser_test COMMAND parser_test)
 add_executable(
         parser_utils_test
         ${CTEST_SOURCE_DIRECTORY}/parser_utils_test.c
-        ${CTEST_SOURCE_DIRECTORY}/../src/util.c
+        ${CTEST_SOURCE_DIRECTORY}/../src/util/util.c
         ${CTEST_SOURCE_DIRECTORY}/../src/parsers/parser_utils.c
         ${CTEST_SOURCE_DIRECTORY}/../src/parsers/parser.c)
 target_link_libraries(parser_utils_test check subunit rt m)
@@ -47,7 +47,7 @@ add_test(NAME parser_utils_test COMMAND parser_utils_test)
 add_executable(
         util_test
         ${CTEST_SOURCE_DIRECTORY}/util_test.c
-        ${CTEST_SOURCE_DIRECTORY}/../src/util.c)
+        ${CTEST_SOURCE_DIRECTORY}/../src/util/util.c)
 target_link_libraries(util_test check subunit rt m)
 add_test(NAME util_test COMMAND util_test)
 
@@ -55,11 +55,10 @@ add_test(NAME util_test COMMAND util_test)
 add_executable(
         commands_parser_test
         ${CTEST_SOURCE_DIRECTORY}/commands_parser_test.c
-        ${CTEST_SOURCE_DIRECTORY}/../src/util.c
-        ${CTEST_SOURCE_DIRECTORY}/../src/logger.c
-        ${CTEST_SOURCE_DIRECTORY}/../src/emalloc.c
-        ${CTEST_SOURCE_DIRECTORY}/../src/queue.c
-        ${CTEST_SOURCE_DIRECTORY}/../src/buffer.c
+        ${CTEST_SOURCE_DIRECTORY}/../src/util/util.c
+        ${CTEST_SOURCE_DIRECTORY}/../src/util/logger.c
+        ${CTEST_SOURCE_DIRECTORY}/../src/util/emalloc.c
+        ${CTEST_SOURCE_DIRECTORY}/../src/util/buffer.c
         ${CTEST_SOURCE_DIRECTORY}/../src/parsers/parser_utils.c
         ${CTEST_SOURCE_DIRECTORY}/../src/parsers/parser.c)
 target_link_libraries(commands_parser_test check subunit rt m)

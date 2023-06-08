@@ -1,6 +1,6 @@
-#include <queue.h>
+#include "queue.h"
 #include <string.h>
-#include <emalloc.h>
+#include "emalloc.h"
 
 static node * removeElementRec(queue *q, node *prev, node *current, void *element,
                                bool (*compareElements)(const void *, const void *));
