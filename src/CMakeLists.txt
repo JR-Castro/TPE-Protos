@@ -6,7 +6,7 @@ message("=== src/CMake")
 load_cache(${CMAKE_CURRENT_SOURCE_DIR}/ ../CMakeCache.txt)
 
 # Include directories
-include_directories("${PROJECT_ROOT_DIR}/src/include/}")
+include_directories(${PROJECT_ROOT_DIR}/src/include/)
 message(STATUS "INCLUDE_DIRS: ${INCLUDE_DIRS}")
 
 # Main executable
