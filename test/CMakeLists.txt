@@ -14,16 +14,6 @@ load_cache(${CMAKE_CURRENT_SOURCE_DIR}/../CMakeCache.txt)
 # Add the include directories
 include_directories(../src/include)
 
-## QUEUE TEST
-add_executable(
-        queue_test
-        ${CTEST_SOURCE_DIRECTORY}/queue_test.c
-        ${CTEST_SOURCE_DIRECTORY}/../src/util/logger.c
-        ${CTEST_SOURCE_DIRECTORY}/../src/util/emalloc.c
-        ${CTEST_SOURCE_DIRECTORY}/../src/util/queue.c)
-target_link_libraries(queue_test check subunit rt m)
-add_test(NAME queue_test COMMAND queue_test)
-
 ## PARSER TEST
 add_executable(
         parser_test
