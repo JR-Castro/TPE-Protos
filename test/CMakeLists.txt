@@ -20,7 +20,7 @@ add_executable(
         ${CTEST_SOURCE_DIRECTORY}/parser_test.c
         ${CTEST_SOURCE_DIRECTORY}/../src/util/util.c
         ${CTEST_SOURCE_DIRECTORY}/../src/parsers/parser.c)
-target_link_libraries(parser_test check subunit rt m)
+target_link_libraries(parser_test check m)
 add_test(NAME parser_test COMMAND parser_test)
 
 ## PARSER UTILS TEST
@@ -30,7 +30,7 @@ add_executable(
         ${CTEST_SOURCE_DIRECTORY}/../src/util/util.c
         ${CTEST_SOURCE_DIRECTORY}/../src/parsers/parser_utils.c
         ${CTEST_SOURCE_DIRECTORY}/../src/parsers/parser.c)
-target_link_libraries(parser_utils_test check subunit rt m)
+target_link_libraries(parser_utils_test check m)
 add_test(NAME parser_utils_test COMMAND parser_utils_test)
 
 ## UTIL TEST
@@ -38,7 +38,7 @@ add_executable(
         util_test
         ${CTEST_SOURCE_DIRECTORY}/util_test.c
         ${CTEST_SOURCE_DIRECTORY}/../src/util/util.c)
-target_link_libraries(util_test check subunit rt m)
+target_link_libraries(util_test check m)
 add_test(NAME util_test COMMAND util_test)
 
 ## COMMANDS PARSER TEST
@@ -51,5 +51,5 @@ add_executable(
         ${CTEST_SOURCE_DIRECTORY}/../src/util/buffer.c
         ${CTEST_SOURCE_DIRECTORY}/../src/parsers/parser_utils.c
         ${CTEST_SOURCE_DIRECTORY}/../src/parsers/parser.c)
-target_link_libraries(commands_parser_test check subunit rt m)
+target_link_libraries(commands_parser_test check m)
 add_test(NAME commands_parser_test COMMAND commands_parser_test)
