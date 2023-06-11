@@ -4,6 +4,11 @@
 #include <sys/socket.h>
 #include "pop3.h"
 
+//Patch for MacOS
+#ifndef MSG_NOSIGNAL
+#define MSG_NOSIGNAL 0
+#endif
+
 static unsigned greetClient(struct selector_key *key) {
     struct client_data *data = key->data;
 
