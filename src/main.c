@@ -36,6 +36,8 @@ int main(const int argc, char **argv) {
 
     close(STDIN_FILENO);
 
+    int ret = -1;
+
 
     const struct selector_init init = {
             .signal = SIGALRM,
@@ -89,9 +91,9 @@ int main(const int argc, char **argv) {
         if (selectStatus != SELECTOR_SUCCESS) goto finally;
     }
 
-    return 0;
+    ret = 0;
 
-    finally:
+finally:
     if (selectStatus != SELECTOR_SUCCESS) {
         log(ERROR, "Error in selector: %s", selector_error(selectStatus));
         if (selectStatus == SELECTOR_IO) {
@@ -104,7 +106,7 @@ int main(const int argc, char **argv) {
     if(serverSocket >= 0) close(serverSocket);
     if(managementSocket >= 0) close(managementSocket);
 
-    return -1;
+    return ret;
 }
 
 
