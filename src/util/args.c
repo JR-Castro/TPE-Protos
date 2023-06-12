@@ -5,6 +5,8 @@
 #include <errno.h>
 #include <getopt.h>
 
+#include "logger.h"
+#include "users.h"
 #include "args.h"
 
 struct pop3_args pop3_args;
@@ -19,7 +21,6 @@ port(const char *s) {
         || sl < 0 || sl > USHRT_MAX) {
         fprintf(stderr, "port should in in the range of 1-65536: %s\n", s);
         exit(1);
-        return 1;
     }
     return (unsigned short)sl;
 }
@@ -41,8 +42,9 @@ usage(const char *progname)
             "   -l <pop3 addr>   Dirección donde servirá  el proxy POP3.\n"
             "   -L <conf  addr>  Dirección donde servirá  el servicio de management.\n"
             "   -p <pop3 port>   Puerto entrante conexiones POP3.\n"
-            "   -P <origin port> Puerto del servidor POP3 en el servidor origen\n"
             "   -o <conf port>   Puerto entrante conexiones management\n"
+            "   -u <user:pass>   Registra usuario y contraseña de un usuario válido.\n"
+            "   -d <directory>   Directorio donde se almacenarán los mails.\n"
             "   -v               Imprime información sobre la versión y termina.\n"
             "\n",
             progname);
@@ -63,7 +65,7 @@ void parse_args(const int argc, char **argv, struct pop3_args *args) {
     int c;
 
     while (true) {
-        c = getopt(argc, argv, "hl:L:p:P:o:v");
+        c = getopt(argc, argv, "hl::L::p::o::u:vd::");
         if (c == -1)
             break;
 
@@ -86,10 +88,18 @@ void parse_args(const int argc, char **argv, struct pop3_args *args) {
             case 'o':
                 args->mng_port = port(optarg);
                 break;
+            case 'u':
+                if (user_add_basic(optarg) != 0) {
+                    log(INFO, "Error adding user: %s\n", optarg);
+                    exit(1);
+                }
+                break;
+            case 'd':
+                args->pop3_directory = optarg;
+                break;
             case 'v':
                 version();
                 exit(0);
-                break;
             default:
                 fprintf(stderr, "Unknown argument %d.\n", c);
                 exit(1);

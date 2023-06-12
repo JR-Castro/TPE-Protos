@@ -24,10 +24,8 @@ struct client_data {
 
 enum pop3_state {
     POP3_GREETING_WRITE = 0,
-    POP3_AUTH_READ,
-    POP3_AUTH_WRITE,
-    POP3_TRANSACTION_READ,
-    POP3_TRANSACTION_WRITE,
+    POP3_READ,
+    POP3_WRITE,
     POP3_UPDATE,
     POP3_CLOSE,
     POP3_ERROR,

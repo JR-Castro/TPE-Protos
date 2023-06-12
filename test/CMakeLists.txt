@@ -53,3 +53,11 @@ add_executable(
         ${CTEST_SOURCE_DIRECTORY}/../src/parsers/parser.c)
 target_link_libraries(commands_parser_test check m)
 add_test(NAME commands_parser_test COMMAND commands_parser_test)
+
+## USERS TEST
+add_executable(
+        users_test
+        ${CTEST_SOURCE_DIRECTORY}/users_test.c
+        ${CTEST_SOURCE_DIRECTORY}/../src/util/users.c)
+target_link_libraries(users_test check m)
+add_test(NAME users_test COMMAND users_test)

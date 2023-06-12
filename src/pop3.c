@@ -32,7 +32,7 @@ static unsigned greetClient(struct selector_key *key) {
 
     if (status != SELECTOR_SUCCESS) goto handle_error;
 
-    return POP3_AUTH_READ;
+    return POP3_READ;
 
 handle_error:
 
@@ -46,7 +46,7 @@ static const struct state_definition client_states[] = {
         .on_write_ready = greetClient,
     },
     {
-        .state = POP3_AUTH_READ,
+        .state = POP3_READ,
         /* TODO:    Since we don't modify our interests, when the client
          *          closes the session, on_write_ready is called and
          *          since it's null the server crashes.
@@ -56,31 +56,7 @@ static const struct state_definition client_states[] = {
         .on_read_ready = NULL,      // Parse auth requests
     },
     {
-        .state = POP3_AUTH_WRITE,
-        .on_arrival = NULL,
-        .on_departure = NULL,
-        .on_read_ready = NULL,
-        .on_write_ready = NULL,
-        .on_block_ready = NULL,
-    },
-    {
-        .state = POP3_TRANSACTION_READ,
-        .on_arrival = NULL,
-        .on_departure = NULL,
-        .on_read_ready = NULL,
-        .on_write_ready = NULL,
-        .on_block_ready = NULL,
-    },
-    {
-        .state = POP3_TRANSACTION_WRITE,
-        .on_arrival = NULL,
-        .on_departure = NULL,
-        .on_read_ready = NULL,
-        .on_write_ready = NULL,
-        .on_block_ready = NULL,
-    },
-    {
-        .state = POP3_UPDATE,
+        .state = POP3_WRITE,
         .on_arrival = NULL,
         .on_departure = NULL,
         .on_read_ready = NULL,
