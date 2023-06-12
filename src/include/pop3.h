@@ -2,12 +2,14 @@
 #define TPE_PROTOS_POP3_H
 
 #include <stdint.h>
+#include <sys/socket.h>
 
 #include "selector.h"
 #include "buffer.h"
 #include "stm.h"
 #include "users.h"
 #include "commands_parser.h"
+#include "pop3_commands.h"
 
 // TODO: Define a proper buffer size
 #define BUFFER_SIZE 4096
@@ -71,5 +73,9 @@ enum pop3_state {
 };
 
 void passiveAccept(struct selector_key *key);
+
+void errResponse(struct client_data *data, const char *msg);
+
+void okResponse(struct client_data *data, const char *msg);
 
 #endif //TPE_PROTOS_POP3_H

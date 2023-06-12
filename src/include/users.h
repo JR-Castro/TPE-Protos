@@ -12,6 +12,12 @@ struct user {
     char password[MAX_PASSWORD];
 };
 
+/**
+ * @brief Recevies a username and password and checks if they are valid
+ * @param username
+ * @param password
+ * @return 1 if the user is valid, 0 otherwise
+ */
 int user_authenticate(char *username, char *password);
 
 int user_add(char *username, char *password);

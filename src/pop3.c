@@ -53,7 +53,7 @@ static void destroyCommandParser(const unsigned state, struct selector_key *key)
     data->commandParser = NULL;
 };
 
-static void errResponse(struct client_data *data, const char *msg) {
+void errResponse(struct client_data *data, const char *msg) {
     size_t limit;
     uint8_t *buffer;
     ssize_t count;
@@ -63,13 +63,13 @@ static void errResponse(struct client_data *data, const char *msg) {
     buffer_write_adv(&data->outputBuffer, count);
 }
 
-static void okResponse(struct client_data *data) {
+void okResponse(struct client_data *data, const char *msg) {
     size_t limit;
     uint8_t *buffer;
     ssize_t count;
 
     buffer = buffer_write_ptr(&data->outputBuffer, &limit);
-    count = snprintf((char *) buffer, limit, "+OK\r\n");
+    count = snprintf((char *) buffer, limit, "+OK %s\r\n", msg);
     buffer_write_adv(&data->outputBuffer, count);
 }
 
@@ -98,7 +98,7 @@ static unsigned readUserCommand(struct selector_key *key) {
             // IF COMMAND IS INVALID, GO TO POP3_ERROR
             // IF COMMAND IS OK, GO TO POP3_WRITE
 
-            okResponse(data);
+            executeCommand(key, data->commandParser->command);
 
             status = selector_set_interest_key(key, OP_WRITE);
             if (status != SELECTOR_SUCCESS) goto handle_error;
