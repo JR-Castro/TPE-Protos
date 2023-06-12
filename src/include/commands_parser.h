@@ -10,6 +10,7 @@
 
 #define CMD_MAX_LENGTH 255
 
+// TODO: Change to char *?
 struct command {
     uint8_t data[CMD_MAX_LENGTH];
     uint8_t * args1;
