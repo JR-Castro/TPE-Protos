@@ -106,7 +106,9 @@ enum command_state parse_byte_command(buffer *inputBuffer, struct command_parser
 
 void command_parser_destroy(struct command_parser *p) {
     log(DEBUG, "Destroying command parser...");
+    memset(p->command, 0, sizeof(struct command));
     free(p->command);
+    memset(p, 0, sizeof(struct command_parser));
     free(p);
     log(DEBUG, "command parser destruction DONE!");
 }

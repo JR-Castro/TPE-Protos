@@ -53,6 +53,26 @@ static void destroyCommandParser(const unsigned state, struct selector_key *key)
     data->commandParser = NULL;
 };
 
+static void errResponse(struct client_data *data, const char *msg) {
+    size_t limit;
+    uint8_t *buffer;
+    ssize_t count;
+
+    buffer = buffer_write_ptr(&data->outputBuffer, &limit);
+    count = snprintf((char *) buffer, limit, "-ERR %s\r\n", msg);
+    buffer_write_adv(&data->outputBuffer, count);
+}
+
+static void okResponse(struct client_data *data) {
+    size_t limit;
+    uint8_t *buffer;
+    ssize_t count;
+
+    buffer = buffer_write_ptr(&data->outputBuffer, &limit);
+    count = snprintf((char *) buffer, limit, "+OK\r\n");
+    buffer_write_adv(&data->outputBuffer, count);
+}
+
 static unsigned readUserCommand(struct selector_key *key) {
     struct client_data *data = key->data;
 
@@ -78,16 +98,23 @@ static unsigned readUserCommand(struct selector_key *key) {
             // IF COMMAND IS INVALID, GO TO POP3_ERROR
             // IF COMMAND IS OK, GO TO POP3_WRITE
 
-            buffer = buffer_write_ptr(&data->outputBuffer, &limit);
-            count = snprintf((char *) buffer, limit, "+OK\r\n");
-            buffer_write_adv(&data->outputBuffer, count);
+            okResponse(data);
 
             status = selector_set_interest_key(key, OP_WRITE);
+            if (status != SELECTOR_SUCCESS) goto handle_error;
             return POP3_WRITE;
         }
 
-        if (commandState == CMD_INVALID) goto handle_error;
+        if (commandState == CMD_INVALID) {
+            errResponse(data, "Invalid command");
+
+            status = selector_set_interest_key(key, OP_WRITE);
+            if (status != SELECTOR_SUCCESS) goto handle_error;
+            return POP3_WRITE;
+        };
     }
+
+    return POP3_READ;
 
 handle_error:
     status = selector_set_interest_key(key, OP_NOOP);
@@ -221,7 +248,6 @@ void pop3Block(struct selector_key *key) {
 void pop3Close(struct selector_key *key) {
     struct state_machine *stm = &((struct client_data *) key->data)->stm;
     stm_handler_close(stm, key);
-//    closeConnection(key);
 }
 
 
