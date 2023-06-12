@@ -1,8 +1,10 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <stdlib.h>
+#include <stdio.h>
 #include <sys/socket.h>
 #include "pop3.h"
+#include "logger.h"
 
 //Patch for MacOS
 #ifndef MSG_NOSIGNAL
@@ -29,6 +31,90 @@ static unsigned greetClient(struct selector_key *key) {
     }
 
     status = selector_set_interest_key(key, OP_READ);
+    if (status != SELECTOR_SUCCESS) goto handle_error;
+
+    return POP3_READ;
+
+handle_error:
+    status = selector_set_interest_key(key, OP_NOOP);
+    return POP3_ERROR;
+}
+
+static void setupCommandParser(const unsigned state, struct selector_key *key) {
+    struct client_data *data = key->data;
+
+    data->commandParser = command_parser_init();
+}
+
+static void destroyCommandParser(const unsigned state, struct selector_key *key) {
+    struct client_data *data = key->data;
+
+    command_parser_destroy(data->commandParser);
+    data->commandParser = NULL;
+};
+
+static unsigned readUserCommand(struct selector_key *key) {
+    struct client_data *data = key->data;
+
+    size_t limit;       // Max we can read from buffer
+    ssize_t count;      // How much we actually read from buffer
+    uint8_t *buffer;    // Pointer to read position in buffer
+    selector_status status;
+
+    buffer = buffer_write_ptr(&data->inputBuffer, &limit);
+    count = recv(key->fd, buffer, limit, MSG_NOSIGNAL);
+
+    if (count <= 0) goto handle_error;
+
+    buffer_write_adv(&data->inputBuffer, count);
+
+    while (buffer_can_read(&data->inputBuffer)) {
+        enum command_state commandState = parse_byte_command(&data->inputBuffer, data->commandParser);
+
+        if (commandState == CMD_OK) {
+            // TODO:
+            // EXECUTE COMMAND FOR THIS USER
+            // IF COMMAND IS QUIT, GO TO POP3_CLOSE
+            // IF COMMAND IS INVALID, GO TO POP3_ERROR
+            // IF COMMAND IS OK, GO TO POP3_WRITE
+
+            buffer = buffer_write_ptr(&data->outputBuffer, &limit);
+            count = snprintf((char *) buffer, limit, "+OK\r\n");
+            buffer_write_adv(&data->outputBuffer, count);
+
+            status = selector_set_interest_key(key, OP_WRITE);
+            return POP3_WRITE;
+        }
+
+        if (commandState == CMD_INVALID) goto handle_error;
+    }
+
+handle_error:
+    status = selector_set_interest_key(key, OP_NOOP);
+
+    return POP3_ERROR;
+}
+
+static unsigned writeResponse(struct selector_key *key) {
+    struct client_data *data = key->data;
+
+    size_t limit;       // Max we can read from buffer
+    ssize_t count;      // How much we actually read from buffer
+    uint8_t *buffer;    // Pointer to read position in buffer
+    selector_status status;
+
+    buffer = buffer_read_ptr(&data->outputBuffer, &limit);
+    count = send(key->fd, buffer, limit, MSG_NOSIGNAL);
+
+    if (count <= 0) goto handle_error;
+
+    buffer_read_adv(&data->outputBuffer, count);
+
+    if (buffer_can_read(&data->outputBuffer)) {
+        return POP3_WRITE;
+    }
+
+    status = selector_set_interest_key(key, OP_READ);
 
     if (status != SELECTOR_SUCCESS) goto handle_error;
 
@@ -36,6 +122,7 @@ static unsigned greetClient(struct selector_key *key) {
 
 handle_error:
 
+    status = selector_set_interest_key(key, OP_NOOP);
     return POP3_ERROR;
 }
 
@@ -51,17 +138,13 @@ static const struct state_definition client_states[] = {
          *          closes the session, on_write_ready is called and
          *          since it's null the server crashes.
          */
-        .on_arrival = NULL,         // Setup parser for auth requests?
-        .on_departure = NULL,       // Free parser for auth requests?
-        .on_read_ready = NULL,      // Parse auth requests
+        .on_arrival = setupCommandParser,         // Setup parser for auth requests?
+        .on_departure = destroyCommandParser,       // Free parser for auth requests?
+        .on_read_ready = readUserCommand,
     },
     {
         .state = POP3_WRITE,
-        .on_arrival = NULL,
-        .on_departure = NULL,
-        .on_read_ready = NULL,
-        .on_write_ready = NULL,
-        .on_block_ready = NULL,
+        .on_write_ready = writeResponse,
     },
     {
         .state = POP3_CLOSE,
@@ -80,13 +163,20 @@ static const struct state_definition client_states[] = {
         .on_block_ready = NULL,
     }};
 
+// TODO: Free everything
 static void closeConnection(struct selector_key *key) {
     struct client_data *data = key->data;
 
-    // TODO: Log disconnection
+    log(INFO, "Closing connection with fd %d", key->fd);
 
-    selector_unregister_fd(key->s, key->fd);
-    close(key->fd);
+    if (data->commandParser != NULL) {
+        command_parser_destroy(data->commandParser);
+    }
+
+    if (key->fd != -1) {
+        selector_unregister_fd(key->s, key->fd);
+        close(key->fd);
+    }
 
     free(data);
 }
@@ -106,23 +196,32 @@ static const fd_handler pop3Handlers = {
 
 void pop3Read(struct selector_key *key) {
     struct state_machine *stm = &((struct client_data *) key->data)->stm;
-    stm_handler_read(stm, key);
+    const enum pop3_state state = stm_handler_read(stm, key);
+    if (state == POP3_ERROR || state == POP3_CLOSE) {
+        closeConnection(key);
+    }
 }
 
 void pop3Write(struct selector_key *key) {
     struct state_machine *stm = &((struct client_data *) key->data)->stm;
-    stm_handler_write(stm, key);
+    const enum pop3_state state = stm_handler_write(stm, key);
+    if (state == POP3_ERROR || state == POP3_CLOSE) {
+        closeConnection(key);
+    }
 }
 
 void pop3Block(struct selector_key *key) {
     struct state_machine *stm = &((struct client_data *) key->data)->stm;
-    stm_handler_block(stm, key);
+    const enum pop3_state state = stm_handler_block(stm, key);
+    if (state == POP3_ERROR || state == POP3_CLOSE) {
+        closeConnection(key);
+    }
 }
 
 void pop3Close(struct selector_key *key) {
     struct state_machine *stm = &((struct client_data *) key->data)->stm;
     stm_handler_close(stm, key);
-    closeConnection(key);
+//    closeConnection(key);
 }
 
 

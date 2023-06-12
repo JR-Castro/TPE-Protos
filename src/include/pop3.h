@@ -6,9 +6,14 @@
 #include "selector.h"
 #include "buffer.h"
 #include "stm.h"
+#include "users.h"
+#include "commands_parser.h"
 
 // TODO: Define a proper buffer size
 #define BUFFER_SIZE 4096
+// POP3 defines a max of 255 chars, including "-ERR " and "\r\n"
+// 255 - 4 + 1 (\r\n) = 252
+#define MAX_ERROR_LENGTH 252
 
 struct client_data {
     struct sockaddr_storage addr;
@@ -20,13 +25,47 @@ struct client_data {
     uint8_t outputBufferData[BUFFER_SIZE];
 
     struct state_machine stm;
+
+    struct user user;
+    bool isLoggedIn;
+
+    struct command_parser *commandParser;
+
+    char error[MAX_ERROR_LENGTH];
 };
 
 enum pop3_state {
+    /*
+     * Sends initial message to client indicating pop3 server is ready
+     * Interests: WRITE
+     *
+     * Transitions:
+     *      - POP3_GREETING_WRITE   if message was not completely sent
+     *      - POP3_READ             if message was sent
+     *      - POP3_ERROR            if error occurred
+     */
     POP3_GREETING_WRITE = 0,
+    /*
+     * Reads user command from client and executes them if they're valid
+     * Interests: READ
+     *
+     * Transitions:
+     *      - POP3_READ             if parsing doesn't reach a conclusion
+     *      - POP3_WRITE            if parsing of command was successful
+     *      - POP3_CLOSE            if command is quit connection
+     *      - POP3_ERROR            if error occurred
+     */
     POP3_READ,
+    /*
+     * Sends commands results to client
+     * Interests: WRITE
+     *
+     * Transitions:
+     *      -POP3_READ              if all bytes in output buffer are sent
+     *      -POP3_WRITE             if there are still bytes to send
+     *      -POP3_ERROR             if error occurred
+     */
     POP3_WRITE,
-    POP3_UPDATE,
     POP3_CLOSE,
     POP3_ERROR,
 };
