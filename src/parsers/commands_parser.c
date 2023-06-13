@@ -41,6 +41,12 @@ struct command_parser * command_parser_init() {
     return p;
 }
 
+void command_parser_reset(struct command_parser *p) {
+    p->state = p->prev_state = CMD_DISPATCH;
+    p->bytes = 0;
+    p->command->args1 = p->command->args2 = NULL;
+}
+
 static enum command_state command_parser_feed(struct command_parser *p, uint8_t c) {
     p->command->data[p->bytes] = c;
     p->bytes++;

@@ -45,6 +45,13 @@ struct command_parser * command_parser_init();
  */
 void command_parser_destroy(struct command_parser *p);
 
+// TODO: Instead of explicitly resetting it, make it so the parser restarts automatically? maybe?
+/**
+ * @brief Reset the parser to initial state
+ * @param p: ptr to command_parser struct
+ */
+void command_parser_reset(struct command_parser *p);
+
 /**
  * @brief feed one byte to the parser and return the next state
  *  CMD_DISPATCH: initial state, parsing command name

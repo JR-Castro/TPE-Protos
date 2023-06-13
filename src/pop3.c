@@ -99,16 +99,10 @@ static unsigned readUserCommand(struct selector_key *key) {
 
             enum pop3_state transition = executeCommand(key, data->commandParser->command);
 
-            switch (transition) {
-                case POP3_WRITE:
-                    status = selector_set_interest_key(key, OP_WRITE);
-                    if (status != SELECTOR_SUCCESS) goto handle_error;
-                    return POP3_WRITE;
-                case POP3_CLOSE:
-                    goto handle_error;
-                default:
-                    return transition;
-            }
+            command_parser_reset(data->commandParser);
+
+            if (transition == POP3_CLOSE) return transition;
+            if (transition == POP3_ERROR) goto handle_error;
         }
 
         if (commandState == CMD_INVALID) {
@@ -120,7 +114,9 @@ static unsigned readUserCommand(struct selector_key *key) {
         };
     }
 
-    return POP3_READ;
+    status = selector_set_interest_key(key, OP_WRITE);
+    if (status != SELECTOR_SUCCESS) goto handle_error;
+    return POP3_WRITE;
 
 handle_error:
     selector_set_interest_key(key, OP_NOOP);
