@@ -5,13 +5,12 @@
 
 #include "selector.h"
 #include "commands_parser.h"
+#include "pop3.h"
 
 /*
  *  Executes a command and sends the response to the client
- *  Returns:    0   if command was executed successfully
- *              -1  if an error occurred
- *              -2  if command was not recognized
+ *  Returns:    pop3 state to transition to.
  */
-int executeCommand(struct selector_key *key, struct command *command);
+enum pop3_state executeCommand(struct selector_key *key, struct command *command);
 
 #endif //TPE_PROTOS_POP3_COMMANDS_H

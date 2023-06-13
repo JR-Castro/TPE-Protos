@@ -30,6 +30,7 @@ struct client_data {
 
     struct user user;
     bool isLoggedIn;
+    bool closed;
 
     struct command_parser *commandParser;
 

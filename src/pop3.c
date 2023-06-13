@@ -95,14 +95,20 @@ static unsigned readUserCommand(struct selector_key *key) {
             // TODO:
             // EXECUTE COMMAND FOR THIS USER
             // IF COMMAND IS QUIT, GO TO POP3_CLOSE
-            // IF COMMAND IS INVALID, GO TO POP3_ERROR
-            // IF COMMAND IS OK, GO TO POP3_WRITE
+            // IF COMMAND IS OK OR INVALID, GO TO POP3_WRITE
 
-            executeCommand(key, data->commandParser->command);
+            enum pop3_state transition = executeCommand(key, data->commandParser->command);
 
-            status = selector_set_interest_key(key, OP_WRITE);
-            if (status != SELECTOR_SUCCESS) goto handle_error;
-            return POP3_WRITE;
+            switch (transition) {
+                case POP3_WRITE:
+                    status = selector_set_interest_key(key, OP_WRITE);
+                    if (status != SELECTOR_SUCCESS) goto handle_error;
+                    return POP3_WRITE;
+                case POP3_CLOSE:
+                    goto handle_error;
+                default:
+                    return transition;
+            }
         }
 
         if (commandState == CMD_INVALID) {
@@ -117,7 +123,7 @@ static unsigned readUserCommand(struct selector_key *key) {
     return POP3_READ;
 
 handle_error:
-    status = selector_set_interest_key(key, OP_NOOP);
+    selector_set_interest_key(key, OP_NOOP);
 
     return POP3_ERROR;
 }
@@ -145,7 +151,7 @@ static unsigned writeResponse(struct selector_key *key) {
 
     if (status != SELECTOR_SUCCESS) goto handle_error;
 
-    return POP3_READ;
+    return data->closed ? POP3_CLOSE : POP3_READ;
 
 handle_error:
 
@@ -153,7 +159,6 @@ handle_error:
     return POP3_ERROR;
 }
 
-// TODO: Handlers to parse and execute actions
 static const struct state_definition client_states[] = {
     {
         .state = POP3_GREETING_WRITE,
@@ -161,10 +166,6 @@ static const struct state_definition client_states[] = {
     },
     {
         .state = POP3_READ,
-        /* TODO:    Since we don't modify our interests, when the client
-         *          closes the session, on_write_ready is called and
-         *          since it's null the server crashes.
-         */
         .on_arrival = setupCommandParser,         // Setup parser for auth requests?
         .on_departure = destroyCommandParser,       // Free parser for auth requests?
         .on_read_ready = readUserCommand,
@@ -175,19 +176,9 @@ static const struct state_definition client_states[] = {
     },
     {
         .state = POP3_CLOSE,
-        .on_arrival = NULL,
-        .on_departure = NULL,
-        .on_read_ready = NULL,
-        .on_write_ready = NULL,
-        .on_block_ready = NULL,
     },
     {
         .state = POP3_ERROR,
-        .on_arrival = NULL,
-        .on_departure = NULL,
-        .on_read_ready = NULL,
-        .on_write_ready = NULL,
-        .on_block_ready = NULL,
     }};
 
 // TODO: Free everything
