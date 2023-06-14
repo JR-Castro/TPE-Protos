@@ -15,6 +15,7 @@ struct file {
 struct file_array_item {
     char *filename;
     unsigned int num;
+    unsigned int size;
     bool deleted;
 };
 
@@ -28,6 +29,8 @@ int fill_file_array(struct selector_key *key);
  *  Frees the memory allocated for the file array
  */
 void destroy_file_array(struct selector_key *key);
+
+void sync_to_maildrop(struct selector_key *key);
 
 
 #endif //TPE_PROTOS_POP3_FILES_H

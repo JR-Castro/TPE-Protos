@@ -29,7 +29,7 @@ struct client_data {
 
     struct user user;
     bool isLoggedIn;
-    bool closed;
+    bool closed; /* Used to indicate to write handler that the connection is being closed */
 
     struct command_parser *commandParser;
 

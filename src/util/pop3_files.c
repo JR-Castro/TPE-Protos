@@ -11,6 +11,22 @@
 
 extern struct pop3_args pop3_args;
 
+/*
+ *  Appends the filename at the end of the path:
+ *  - 'path' -> 'path/filename'
+ *  - 'path/' -> 'path/filename'
+ *  Returns -1 if the resulting path is too long, 0 otherwise
+ */
+static int get_file_path(char path[MAX_PATH_LENGTH], char *filename) {
+    unsigned int length = strlen(pop3_args.pop3_directory);
+
+    if (snprintf(path, MAX_PATH_LENGTH, "%s%s%s", pop3_args.pop3_directory,
+                 pop3_args.pop3_directory[length-1] == '/' ? "" : "/",
+                 filename) > MAX_PATH_LENGTH)
+        return -1;
+    return 0;
+}
+
 int fill_file_array(struct selector_key *key) {
     struct client_data *data = key->data;
     struct file_array_item *file_array_item;
@@ -25,11 +41,7 @@ int fill_file_array(struct selector_key *key) {
     if (fileArray == NULL)
         return -1;
 
-    unsigned int length = strlen(path);
-
-    if (snprintf(directory, MAX_PATH_LENGTH, "%s%s%s", path,
-                 path[length-1] == '/' ? "" : "/",
-                 data->user.username) > MAX_PATH_LENGTH)
+    if (get_file_path(directory, data->user.username) < 0)
         return -1;
 
     DIR *dr = opendir(directory);
@@ -43,7 +55,9 @@ int fill_file_array(struct selector_key *key) {
     while ((de = readdir(dr)) != NULL && i < MAX_EMAILS) {
         if (de->d_type == DT_REG) {
             char filepath[MAX_PATH_LENGTH];
-            snprintf(filepath, MAX_PATH_LENGTH, "%s/%s", directory, de->d_name);
+
+            if (get_file_path(filepath, de->d_name) < 0)
+                continue;
 
             fileArray[i].filename = malloc(strlen(de->d_name) + 1);
             strcpy(fileArray[i].filename, de->d_name);
@@ -53,6 +67,7 @@ int fill_file_array(struct selector_key *key) {
 
             fileArray[i].num = i;
             fileArray[i].deleted = false;
+            fileArray[i].size = st.st_size;
             i++;
 
         }
@@ -78,3 +93,30 @@ void destroy_file_array(struct selector_key *key) {
     free(data->fileArray);
 }
 
+void sync_to_maildrop(struct selector_key *key) {
+    struct client_data *data = key->data;
+    struct file_array_item *fa = data->fileArray;
+    char directory[MAX_PATH_LENGTH];
+
+    if (get_file_path(directory, data->user.username) < 0)
+        return;
+
+    int ret = 0;
+
+    for (int i = 0; i < data->fileArraySize; ++i) {
+        if (fa[i].deleted) {
+            char filepath[MAX_PATH_LENGTH];
+
+            if (get_file_path(filepath, fa[i].filename) < 0)
+                continue;
+
+            ret += unlink(filepath);
+        }
+    }
+
+    if (ret) {
+        errResponse(data, "some deleted messages not removed");
+    } else {
+        okResponse(data, "");
+    }
+}

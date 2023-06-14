@@ -3,12 +3,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/socket.h>
+
 #include "pop3.h"
 #include "logger.h"
 
 //Patch for MacOS
 #ifndef MSG_NOSIGNAL
-#define MSG_NOSIGNAL 0
+#define MSG_NOSIGNAL 0x4000
 #endif
 
 static unsigned greetClient(struct selector_key *key) {

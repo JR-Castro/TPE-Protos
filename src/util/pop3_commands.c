@@ -125,12 +125,14 @@ static enum pop3_state executePass(struct selector_key *key, struct command *com
 static enum pop3_state executeQuit(struct selector_key *key, struct command *command) {
     struct client_data *data = key->data;
 
-    /*if (data->isLoggedIn) {
+    if (data->isLoggedIn) {
         // SYNC CHANGES TO FILE SYSTEM
-    }*/
+        sync_to_maildrop(key);
+    } else {
+        okResponse(data, "Bye");
+    }
 
     data->closed = true;
-    okResponse(data, "Bye");
 
     return POP3_WRITE;
 }
@@ -156,7 +158,32 @@ static enum pop3_state executeList(struct selector_key *key, struct command *com
 }
 
 static enum pop3_state executeDele(struct selector_key *key, struct command *command) {
-    errResponse(key->data, "Not implemented");
+
+    struct client_data *data = key->data;
+
+    if (command->args1 == NULL) {
+        errResponse(key->data, "Invalid arguments");
+        goto finally;
+    }
+
+    unsigned int mailIndex = strtoul((char*)command->args1, NULL, 10);
+
+    if (mailIndex >= data->fileArraySize) {
+        errResponse(key->data, "Invalid mail index");
+        goto finally;
+    }
+
+    if (data->fileArray[mailIndex].deleted) {
+        errResponse(key->data, "Mail already deleted");
+        goto finally;
+    }
+
+    data->fileArray[mailIndex].deleted = true;
+    char response[MAX_ONELINE_LENGTH];
+    snprintf(response, MAX_ONELINE_LENGTH, "Message %u deleted", mailIndex);
+    okResponse(key->data, response);
+
+finally:
     return POP3_WRITE;
 }
 
