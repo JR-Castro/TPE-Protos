@@ -74,6 +74,16 @@ void okResponse(struct client_data *data, const char *msg) {
     buffer_write_adv(&data->outputBuffer, count);
 }
 
+void normalResponse(struct client_data *data, const char *msg) {
+    size_t limit;
+    uint8_t *buffer;
+    ssize_t count;
+
+    buffer = buffer_write_ptr(&data->outputBuffer, &limit);
+    count = snprintf((char *) buffer, limit, "%s\r\n", msg);
+    buffer_write_adv(&data->outputBuffer, count);
+}
+
 static unsigned readUserCommand(struct selector_key *key) {
     struct client_data *data = key->data;
 

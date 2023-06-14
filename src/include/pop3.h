@@ -92,4 +92,10 @@ void errResponse(struct client_data *data, const char *msg);
  */
 void okResponse(struct client_data *data, const char *msg);
 
+
+/*
+ *  Writes a response to the client: "%s\r\n"
+ */
+void normalResponse(struct client_data *data, const char *msg);
+
 #endif //TPE_PROTOS_POP3_H

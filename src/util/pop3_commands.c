@@ -153,8 +153,22 @@ static enum pop3_state executeStat(struct selector_key *key, struct command *com
 }
 
 static enum pop3_state executeList(struct selector_key *key, struct command *command) {
-    errResponse(key->data, "Not implemented");
-    return POP3_WRITE;
+    struct client_data *data = key->data;
+
+    okResponse(data, "");
+
+    int sent = 0;
+
+    for (int i = 0; i < data->fileArraySize; ++i) {
+        if (!data->fileArray[i].deleted) {
+            char response[MAX_ONELINE_LENGTH];
+            snprintf(response, MAX_ONELINE_LENGTH, "%u %u", i, data->fileArray[i].size);
+            normalResponse(data, response);
+            sent++;
+        }
+    }
+
+    return sent ? POP3_WRITE : POP3_READ;
 }
 
 static enum pop3_state executeDele(struct selector_key *key, struct command *command) {
