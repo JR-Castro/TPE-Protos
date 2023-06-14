@@ -146,7 +146,7 @@ static enum pop3_state executeStat(struct selector_key *key, struct command *com
     }
 
     char response[MAX_ONELINE_LENGTH];
-    snprintf(response, MAX_ONELINE_LENGTH, "%d %d", data->fileArraySize, data->totalMailSize);
+    snprintf(response, MAX_ONELINE_LENGTH, "%d %u", data->fileArraySize, data->totalMailSize);
     okResponse(data, response);
 
     return POP3_WRITE;
