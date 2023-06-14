@@ -80,11 +80,12 @@ static unsigned readUserCommand(struct selector_key *key) {
     ssize_t count;      // How much we actually read from buffer
     uint8_t *buffer;    // Pointer to read position in buffer
     selector_status status;
+    enum pop3_state transition;
 
     buffer = buffer_write_ptr(&data->inputBuffer, &limit);
     count = recv(key->fd, buffer, limit, MSG_NOSIGNAL);
 
-    if (count <= 0) goto handle_error;
+    if (count <= 0 && limit != 0) goto handle_error;
 
     buffer_write_adv(&data->inputBuffer, count);
 
@@ -97,7 +98,7 @@ static unsigned readUserCommand(struct selector_key *key) {
             // IF COMMAND IS QUIT, GO TO POP3_CLOSE
             // IF COMMAND IS OK OR INVALID, GO TO POP3_WRITE
 
-            enum pop3_state transition = executeCommand(key, data->commandParser->command);
+            transition = executeCommand(key, data->commandParser->command);
 
             command_parser_reset(data->commandParser);
 
@@ -114,9 +115,13 @@ static unsigned readUserCommand(struct selector_key *key) {
         };
     }
 
-    status = selector_set_interest_key(key, OP_WRITE);
-    if (status != SELECTOR_SUCCESS) goto handle_error;
-    return POP3_WRITE;
+    if (transition == POP3_WRITE) {
+        status = selector_set_interest_key(key, OP_WRITE);
+        if (status != SELECTOR_SUCCESS) goto handle_error;
+        return POP3_WRITE;
+    }
+
+    return POP3_READ;
 
 handle_error:
     selector_set_interest_key(key, OP_NOOP);
