@@ -10,12 +10,11 @@
 #include "users.h"
 #include "commands_parser.h"
 #include "pop3_commands.h"
+#include "pop3_files.h"
+#include "definitions.h"
 
 // TODO: Define a proper buffer size
-#define BUFFER_SIZE 4096
-// POP3 defines a max of 255 chars, including "-ERR " and "\r\n"
-// 255 - 4 + 1 (\r\n) = 252
-#define MAX_ERROR_LENGTH 252
+
 
 struct client_data {
     struct sockaddr_storage addr;
@@ -33,6 +32,12 @@ struct client_data {
     bool closed;
 
     struct command_parser *commandParser;
+
+    // TODO: Also add byte-stuffing parser
+    struct file_array_item *fileArray;
+    unsigned int fileArraySize;
+    unsigned int totalMailSize;
+    struct file *email;
 
     char error[MAX_ERROR_LENGTH];
 };
@@ -75,8 +80,16 @@ enum pop3_state {
 
 void passiveAccept(struct selector_key *key);
 
+/*
+ * Automatically formats response: "-ERR %s\r\n"
+ * Should use the MAX_ERROR_LENGTH macro to ensure protocol compliance
+ */
 void errResponse(struct client_data *data, const char *msg);
 
+/*
+ * Automatically formats response: "+OK %s\r\n"
+ * Should use the MAX_ONELINE_LENGTH macro to ensure protocol compliance
+ */
 void okResponse(struct client_data *data, const char *msg);
 
 #endif //TPE_PROTOS_POP3_H

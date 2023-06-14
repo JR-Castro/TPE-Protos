@@ -1,8 +1,10 @@
 #include <stdio.h>
 
 #include "pop3_commands.h"
+#include "pop3_files.h"
 #include "pop3.h"
 #include "users.h"
+#include "definitions.h"
 
 struct command_function {
     char *name;
@@ -57,6 +59,8 @@ enum pop3_state executeCommand(struct selector_key *key, struct command *command
 
     errResponse(key->data, "Command not recognized");
 
+    command_parser_reset(data->commandParser);
+
     return POP3_WRITE;
 }
 
@@ -105,6 +109,11 @@ static enum pop3_state executePass(struct selector_key *key, struct command *com
 
         // TODO: We should use a lock in the mail.
 
+        if (fill_file_array(key) < 0) {
+            errResponse(data, "Error reading mails");
+            return POP3_ERROR;
+        }
+
         okResponse(data, "Logged in");
     } else {
         errResponse(data, "Invalid credentials");
@@ -127,7 +136,17 @@ static enum pop3_state executeQuit(struct selector_key *key, struct command *com
 }
 
 static enum pop3_state executeStat(struct selector_key *key, struct command *command) {
-    errResponse(key->data, "Not implemented");
+    struct client_data *data = key->data;
+
+    if (data->fileArray == NULL) {
+        errResponse(data, "Error reading mails");
+        return POP3_ERROR;
+    }
+
+    char response[MAX_ONELINE_LENGTH];
+    snprintf(response, MAX_ONELINE_LENGTH, "%d %d", data->fileArraySize, data->totalMailSize);
+    okResponse(data, response);
+
     return POP3_WRITE;
 }
 

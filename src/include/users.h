@@ -2,10 +2,7 @@
 #define TPE_PROTOS_USERS_H
 
 #include <stdint.h>
-
-#define MAX_USERS 1024
-#define MAX_USERNAME 64
-#define MAX_PASSWORD 64
+#include "definitions.h"
 
 struct user {
     char username[MAX_USERNAME];

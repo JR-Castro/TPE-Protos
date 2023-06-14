@@ -95,7 +95,7 @@ void parse_args(const int argc, char **argv, struct pop3_args *args) {
                 }
                 break;
             case 'd':
-                args->pop3_directory = optarg;
+                args->pop3_directory = argv[optind];
                 break;
             case 'v':
                 version();

@@ -135,7 +135,7 @@ static unsigned writeResponse(struct selector_key *key) {
     buffer = buffer_read_ptr(&data->outputBuffer, &limit);
     count = send(key->fd, buffer, limit, MSG_NOSIGNAL);
 
-    if (count <= 0) goto handle_error;
+    if (count <= 0 && limit != 0) goto handle_error;
 
     buffer_read_adv(&data->outputBuffer, count);
 
@@ -190,6 +190,10 @@ static void closeConnection(struct selector_key *key) {
     if (key->fd != -1) {
         selector_unregister_fd(key->s, key->fd);
         close(key->fd);
+    }
+
+    if (data->fileArray != NULL) {
+        destroy_file_array(key);
     }
 
     free(data);
