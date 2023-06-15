@@ -93,12 +93,32 @@ START_TEST (test_buffer_misc) {
 }
 END_TEST
 
+START_TEST(buffer_snprintf_test) {
+    struct buffer buf;
+    buffer *b = &buf;
+    uint8_t direct_buff[30];
+    buffer_init(&buf, N(direct_buff), direct_buff);
+    ck_assert_ptr_eq(&buf, b);
+    ck_assert_int_eq(true,  buffer_can_write(b));
+    ck_assert_int_eq(false, buffer_can_read(b));
+    size_t wbytes = 0;
+    uint8_t *ptr = buffer_write_ptr(b, &wbytes);
+    ck_assert_uint_eq(30, wbytes);
+    char msg[] = "Hello world";
+    int count = buffer_snprintf(b, "%s\n", msg);
+    printf("count: %d\n", count);
+    printf("msg: %s", b->data);
+    ptr = buffer_write_ptr(b, &wbytes);
+    ck_assert_uint_eq(30 - count, wbytes);
+} END_TEST
+
 Suite *
 suite(void) {
     Suite *s   = suite_create("buffer");
     TCase *tc  = tcase_create("buffer");
 
     tcase_add_test(tc, test_buffer_misc);
+    tcase_add_test(tc, buffer_snprintf_test);
     suite_add_tcase(s, tc);
 
     return s;

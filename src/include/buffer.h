@@ -3,6 +3,8 @@
 
 #include <stdbool.h>
 #include <unistd.h>  // size_t, ssize_t
+#include <stdarg.h>
+#include <stdio.h>
 
 /**
  * buffer.c - buffer con acceso directo (útil para I/O) que mantiene
@@ -145,5 +147,7 @@ buffer_can_read(buffer *b);
 bool
 buffer_can_write(buffer *b);
 
+int
+buffer_snprintf(buffer *b, const char *fmt, ...);
 
 #endif
