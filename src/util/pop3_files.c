@@ -107,10 +107,13 @@ void sync_to_maildrop(struct selector_key *key) {
         if (fa[i].deleted) {
             char filepath[MAX_PATH_LENGTH];
 
-            if (get_file_path(filepath, fa[i].filename) < 0)
-                continue;
+            snprintf(filepath, MAX_PATH_LENGTH, "%s/%s", directory, fa[i].filename);
 
             ret += unlink(filepath);
+            if (ret < 0) {
+                perror("unlink");
+                printf("Error deleting file %s\n", filepath);
+            }
         }
     }
 

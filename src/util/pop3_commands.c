@@ -202,7 +202,16 @@ finally:
 }
 
 static enum pop3_state executeRset(struct selector_key *key, struct command *command) {
-    errResponse(key->data, "Not implemented");
+    struct client_data *data = key->data;
+
+    for (int i = 0; i < data->fileArraySize; ++i) {
+        data->fileArray[i].deleted = false;
+    }
+
+    char response[MAX_ONELINE_LENGTH];
+    snprintf(response, MAX_ONELINE_LENGTH, "Maildrop has %u messages (%u octets)", data->fileArraySize, data->totalMailSize);
+    okResponse(key->data, response);
+
     return POP3_WRITE;
 }
 
