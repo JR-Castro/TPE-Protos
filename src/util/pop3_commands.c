@@ -168,6 +168,8 @@ static enum pop3_state executeList(struct selector_key *key, struct command *com
         }
     }
 
+    normalResponse(data, ".");
+
     return sent ? POP3_WRITE : POP3_READ;
 }
 
