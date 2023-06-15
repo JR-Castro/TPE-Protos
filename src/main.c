@@ -131,8 +131,7 @@ static int setupSocket(char *addr, int port) {
                         SOL_SOCKET,
                         SO_REUSEADDR,
                         &(int) {1},
-                        sizeof(int))) {
-        // TODO: Log
+                        sizeof(int)) < 0) {
         goto handle_error;
     }
 

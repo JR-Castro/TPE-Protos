@@ -11,14 +11,12 @@
 #include <pthread.h>
 
 #include <stdint.h> // SIZE_MAX
-#include <unistd.h>
 #include <fcntl.h>
-#include <sys/types.h>
-#include <sys/socket.h>
 #include <sys/select.h>
 #include <sys/signal.h>
 #include <signal.h>
 #include "../include/selector.h"
+#include "../include/logger.h"
 
 #define N(x) (sizeof(x)/sizeof((x)[0]))
 
@@ -461,6 +459,11 @@ handle_iteration(fd_selector s) {
         if(ITEM_USED(item)) {
             key.fd   = item->fd;
             key.data = item->data;
+            if(FD_ISSET(i, &s->master_r) || FD_ISSET(i, &s->master_w)) {
+                if (-1 == fcntl(i, F_GETFD, 0)) {
+                    log(ERROR, "Bad descriptor: %d", i);
+                }
+            }
             if(FD_ISSET(item->fd, &s->slave_r)) {
                 if(OP_READ & item->interest) {
                     if(0 == item->handler->handle_read) {
