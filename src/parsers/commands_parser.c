@@ -96,6 +96,8 @@ static enum command_state command_parser_feed(struct command_parser *p, uint8_t 
             p->prev_state = CMD_INVALID;
             p->state = (c == '\r') ? CMD_CRLF : CMD_INVALID;
             break;
+        case CMD_OK:
+            break;
     }
 
     return p->state;
