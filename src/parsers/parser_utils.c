@@ -102,15 +102,13 @@ parser_utils_strcmpi(const char *s) {
     for(size_t i = 0; i < n; i++) {
         const size_t dest = (i + 1 == n) ? st_eq : i + 1;
 
-        transitions[i * 3 + 0].when = tolower(s[i]);
+        // Comparacion case sensitive
+        transitions[i * 3 + 0].when = s[i];
         transitions[i * 3 + 0].dest = dest;
         transitions[i * 3 + 0].act1 = i + 1 == n ? eq : may_eq;
-        transitions[i * 3 + 1].when = toupper(s[i]);
-        transitions[i * 3 + 1].dest = dest;
-        transitions[i * 3 + 1].act1 = i + 1 == n ? eq : may_eq;
-        transitions[i * 3 + 2].when = ANY;
-        transitions[i * 3 + 2].dest = st_neq;
-        transitions[i * 3 + 2].act1 = neq;
+        transitions[i * 3 + 1].when = ANY;
+        transitions[i * 3 + 1].dest = st_neq;
+        transitions[i * 3 + 1].act1 = neq;
         states     [i]              = transitions + (i * 3 + 0);
         nstates    [i]              = 3;
     }

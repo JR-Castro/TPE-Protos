@@ -10,6 +10,11 @@
 
 #include "netutils.h"
 
+//Patch for MacOS
+#ifndef MSG_NOSIGNAL
+#define MSG_NOSIGNAL 0
+#endif
+
 #define N(x) (sizeof(x)/sizeof((x)[0]))
 
 extern const char *
@@ -58,10 +63,10 @@ sockaddr_to_human(char *buff, const size_t buffsize,
 
 int
 sock_blocking_write(const int fd, buffer *b) {
-        int  ret = 0;
+    int  ret = 0;
     ssize_t  nwritten;
-	 size_t  n;
-	uint8_t *ptr;
+    size_t  n;
+    uint8_t *ptr;
 
     do {
         ptr = buffer_read_ptr(b, &n);
@@ -101,3 +106,7 @@ sock_blocking_copy(const int source, const int dest) {
     return ret;
 }
 
+int is_ipv6(const char* host) {
+    struct sockaddr_in6 sa;
+    return inet_pton(AF_INET6, host, &(sa.sin6_addr));
+}

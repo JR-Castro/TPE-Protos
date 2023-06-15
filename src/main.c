@@ -6,36 +6,38 @@
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
+#include <arpa/inet.h>
 
-#include "selector.h"
-#include "./include/logger.h"
-#include "pop3.h"
+#include "include/selector.h"
+#include "include/pop3.h"
+#include "include/args.h"
+#include "logger.h"
 
-#define SERVICE "pop3"
-#define DEFAULT_PORT "1100"
-#define DEFAULT_PORT_NUM 1100
 #define MAX_CON 3
 #define SELECTOR_SIZE 1024
+
+extern struct pop3_args pop3_args;
+
+int serverSocket = -1;
+int managementSocket = -1;
 
 // skipcq: CXX-W2009
 static bool terminate = false;
 
-static int setupSocket(void);
+static int setupSocket(char *addr, int port);
 
 static void sigterm_handler(const int signal) {
-    log(INFO, "Signal %d", signal);
+    log(INFO, "Signal %d received. Shutting down...", signal);
     terminate = true;
 }
 
-int main(const int argc, const char **argv) {
-
-    int ret = 0;
+int main(const int argc, char **argv) {
+    parse_args(argc, argv, &pop3_args);
 
     close(STDIN_FILENO);
-    signal(SIGTERM, sigterm_handler);
-    signal(SIGINT, sigterm_handler);
 
-    int serverSocket = setupSocket();
+    int ret = -1;
+
 
     const struct selector_init init = {
             .signal = SIGALRM,
@@ -46,16 +48,25 @@ int main(const int argc, const char **argv) {
     };
 
     fd_selector selector = NULL;
-    selector_status selectStatus = SELECTOR_SUCCESS;
+    selector_status selectStatus = selector_init(&init);
+    if (selectStatus != SELECTOR_SUCCESS) goto finally;
 
-    if ((ret = selector_init(&init)) != SELECTOR_SUCCESS) {
+    serverSocket = setupSocket((pop3_args.pop3_addr == NULL) ? "::" : pop3_args.pop3_addr,pop3_args.pop3_port);
+    if (serverSocket == -1) goto finally;
+
+    managementSocket = setupSocket((pop3_args.mng_addr == NULL) ? "::" : pop3_args.mng_addr,pop3_args.mng_port);
+    if (managementSocket == -1) goto finally;
+
+    signal(SIGTERM, sigterm_handler);
+    signal(SIGINT, sigterm_handler);
+
+    if ((serverSocket != -1 && selector_fd_set_nio(serverSocket) == -1) ||
+        (managementSocket != -1 && selector_fd_set_nio(managementSocket) == -1)) {
         goto finally;
     }
 
     selector = selector_new(SELECTOR_SIZE);
-    if (selector == NULL) {
-        goto finally;
-    }
+    if (selector == NULL) goto finally;
 
     // Make handlers
 
@@ -66,102 +77,87 @@ int main(const int argc, const char **argv) {
             .handle_block = NULL,
     };
 
-    const char *err_msg = NULL;
-
     // Register fd's
-
     selectStatus = selector_register(selector, serverSocket, &passiveHandler, OP_READ, NULL);
-    if (selectStatus != SELECTOR_SUCCESS) {
-        goto finally;
-    }
+    if(selectStatus != SELECTOR_SUCCESS) goto finally;
+
+    selectStatus = selector_register(selector, managementSocket, &passiveHandler, OP_READ, NULL);
+    if(selectStatus != SELECTOR_SUCCESS) goto finally;
 
     // Loop
 
     while (!terminate) {
         selectStatus = selector_select(selector);
-        if (selectStatus != SELECTOR_SUCCESS) { 
-            goto finally;
-        }
+        if (selectStatus != SELECTOR_SUCCESS) goto finally;
     }
 
     ret = 0;
 
-    finally:
+finally:
     if (selectStatus != SELECTOR_SUCCESS) {
-        log(ERROR, "%s: %s", (err_msg == NULL) ? "" : err_msg,
-            selectStatus == SELECTOR_IO
-            ? strerror(errno)
-            : selector_error(selectStatus));
-        ret = 2;
-    } else if (err_msg != NULL) {
-        log(ERROR, "%s", err_msg)
-        ret = 1;
+        log(ERROR, "Error in selector: %s", selector_error(selectStatus));
+        if (selectStatus == SELECTOR_IO) {
+            log(ERROR, "More info: %s", strerror(errno));
+        }
     }
-    if (selector != NULL) {
-        selector_destroy(selector);
-    }
-    log(INFO, "%s", "Closing the selector");
+    if (selector != NULL) selector_destroy(selector);
     selector_close();
 
-    if (serverSocket != -1) { 
-        log(INFO, "%s", "Closing the server socket");
-        close(serverSocket);
-    }
-    log(INFO, "%s", "Closing main");
+    if(serverSocket >= 0) close(serverSocket);
+    if(managementSocket >= 0) close(managementSocket);
+
     return ret;
 }
 
-static int setupSocket(void) {
+
+static int setupSocket(char *addr, int port) {
 
     struct sockaddr_in6 serveraddr;
+    int newSocket;
 
-    const char *err_msg = NULL;
-
-    int newSocket = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
-
-    if (newSocket < 0) {
-        err_msg = "Socket failed";
-        goto handle_error;
+    if(port < 0){
+        //TODO log -> invalid port
+        return -1;
     }
 
+    //chequeo de addr
+
+    newSocket = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
+
+    if (newSocket < 0) goto handle_error;
+
     if (setsockopt(newSocket,
-                   SOL_SOCKET,
-                   SO_REUSEADDR,
-                   &(int) {1},
-                   sizeof(int))) {
+                        SOL_SOCKET,
+                        SO_REUSEADDR,
+                        &(int) {1},
+                        sizeof(int))) {
         // TODO: Log
     }
 
+
     memset(&serveraddr, 0, sizeof(serveraddr));
-    serveraddr.sin6_port = htons(DEFAULT_PORT_NUM);
+    serveraddr.sin6_port = htons(port);
     serveraddr.sin6_family = AF_INET6; // This allows connections from any IPv4 or IPv6 client.
     serveraddr.sin6_addr = in6addr_any;
+
+    if (inet_pton(AF_INET6, addr, &serveraddr.sin6_addr) < 0) goto handle_error;
 
     if (bind(newSocket,
              (struct sockaddr *) &serveraddr,
              sizeof(serveraddr)))
         goto handle_error;
 
-    if (listen(newSocket, MAX_CON)) {
-        goto handle_error;
-    }
+    if (listen(newSocket, MAX_CON)) goto handle_error;
 
-    if (selector_fd_set_nio(newSocket) == -1) {
-        err_msg = "Getting socket flags";
-        goto handle_error;
-    }
+    if (selector_fd_set_nio(newSocket) == -1) goto handle_error;
 
     return newSocket;
 
     handle_error:
-    // TODO: Log errors
-    if (newSocket >= 0) {
-        log(INFO, "%s", "Closing socket");
-        close(newSocket);
-    }
-    
+    log(ERROR, "Error setting up socket, %s", strerror(errno));
 
     close(newSocket);
 
     return -1;
 }
+

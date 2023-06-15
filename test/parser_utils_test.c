@@ -14,12 +14,14 @@ assert_eq(const unsigned type, const int c, const struct parser_event *e) {
 }
 
 START_TEST (test_eq) {
-    const struct parser_definition d = parser_utils_strcmpi("foo");
+    const struct parser_definition d = parser_utils_strcmpi("foo ");
 
     struct parser *parser = parser_init(parser_no_classes(), &d);
     assert_eq(STRING_CMP_MAYEQ,  'f', parser_feed(parser, 'f'));
-    assert_eq(STRING_CMP_MAYEQ,  'O', parser_feed(parser, 'O'));
-    assert_eq(STRING_CMP_EQ,     'o', parser_feed(parser, 'o'));
+    assert_eq(STRING_CMP_MAYEQ,  'o', parser_feed(parser, 'o'));
+    assert_eq(STRING_CMP_MAYEQ,  'o', parser_feed(parser, 'o'));
+    assert_eq(STRING_CMP_EQ,     ' ', parser_feed(parser, ' '));
+    assert_eq(STRING_CMP_NEQ,   '\n', parser_feed(parser, '\n'));
     assert_eq(STRING_CMP_NEQ,    'X', parser_feed(parser, 'X'));
     assert_eq(STRING_CMP_NEQ,    'y', parser_feed(parser, 'y'));
 

@@ -13,6 +13,8 @@ typedef enum {DEBUG=0, INFO, ERROR, FATAL} LOG_LEVEL;
 
 extern LOG_LEVEL current_level;
 
+#define ERRVAL -1
+
 /**
 *  Minimo nivel de log a registrar. Cualquier llamada a log con un nivel mayor a newLevel sera ignorada
 **/

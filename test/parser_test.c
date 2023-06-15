@@ -31,33 +31,33 @@ bar(struct parser_event *ret, const uint8_t c) {
 }
 
 static const struct parser_state_transition ST_S0 [] =  {
-    {.when = 'F',        .dest = S0,        .act1 = foo,},
-    {.when = 'f',        .dest = S0,        .act1 = foo,},
-    {.when = ANY,        .dest = S1,        .act1 = bar,},
+        {.when = 'F',        .dest = S0,        .act1 = foo,},
+        {.when = 'f',        .dest = S0,        .act1 = foo,},
+        {.when = ANY,        .dest = S1,        .act1 = bar,},
 };
 static const struct parser_state_transition ST_S1 [] =  {
-    {.when = 'F',        .dest = S0,        .act1 = foo,},
-    {.when = 'f',        .dest = S0,        .act1 = foo,},
-    {.when = ANY,        .dest = S1,        .act1 = bar,},
+        {.when = 'F',        .dest = S0,        .act1 = foo,},
+        {.when = 'f',        .dest = S0,        .act1 = foo,},
+        {.when = ANY,        .dest = S1,        .act1 = bar,},
 };
 
 static const struct parser_state_transition *states [] = {
-    ST_S0,
-    ST_S1,
+        ST_S0,
+        ST_S1,
 };
 
 #define N(x) (sizeof(x)/sizeof((x)[0]))
 
 static const size_t states_n [] = {
-    N(ST_S0),
-    N(ST_S1),
+        N(ST_S0),
+        N(ST_S1),
 };
 
 static struct parser_definition definition = {
-    .states_count = N(states),
-    .states       = states,
-    .states_n     = states_n,
-    .start_state  = S0,
+        .states_count = N(states),
+        .states       = states,
+        .states_n     = states_n,
+        .start_state  = S0,
 };
 
 //// TEST
@@ -112,4 +112,3 @@ main(void) {
     srunner_free(sr);
     return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
-
