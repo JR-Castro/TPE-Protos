@@ -4,10 +4,10 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
-#include "pop3.h"
-#include "pop3_files.h"
-#include "args.h"
-#include "emalloc.h"
+#include "../include/pop3.h"
+#include "../include/pop3_files.h"
+#include "../include/args.h"
+#include "../include/emalloc.h"
 
 extern struct pop3_args pop3_args;
 

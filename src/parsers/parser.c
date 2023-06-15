@@ -5,7 +5,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include <parser.h>
+#include "../include/parser.h"
 #include <util.h>
 
 /* CDT del parser */

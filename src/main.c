@@ -11,7 +11,7 @@
 #include "include/selector.h"
 #include "include/pop3.h"
 #include "include/args.h"
-#include "logger.h"
+#include "include/logger.h"
 
 #define MAX_CON 3
 #define SELECTOR_SIZE 1024
@@ -117,6 +117,7 @@ static int setupSocket(char *addr, int port) {
 
     if(port < 0){
         //TODO log -> invalid port
+        log(ERROR, "Invalid port");
         return -1;
     }
 
@@ -132,6 +133,7 @@ static int setupSocket(char *addr, int port) {
                         &(int) {1},
                         sizeof(int))) {
         // TODO: Log
+        goto handle_error;
     }
 
 

@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
-#include "netutils.h"
+#include "../include/netutils.h"
 
 //Patch for MacOS
 #ifndef MSG_NOSIGNAL

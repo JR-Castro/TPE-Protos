@@ -5,9 +5,9 @@
 #include <errno.h>
 #include <getopt.h>
 
-#include "logger.h"
-#include "users.h"
-#include "args.h"
+#include "../include/logger.h"
+#include "../include/users.h"
+#include "../include/args.h"
 
 struct pop3_args pop3_args;
 
