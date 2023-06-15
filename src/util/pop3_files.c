@@ -1,13 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
-#include <unistd.h>
 #include <sys/stat.h>
 
 #include "pop3.h"
 #include "pop3_files.h"
 #include "args.h"
-#include "emalloc.h"
+#include "logger.h"
 
 extern struct pop3_args pop3_args;
 
@@ -17,7 +16,7 @@ extern struct pop3_args pop3_args;
  *  - 'path/' -> 'path/filename'
  *  Returns -1 if the resulting path is too long, 0 otherwise
  */
-static int get_file_path(char path[MAX_PATH_LENGTH], char *filename) {
+static int get_file_path(char path[MAX_PATH_LENGTH], const char *filename) {
     unsigned int length = strlen(pop3_args.pop3_directory);
 
     if (snprintf(path, MAX_PATH_LENGTH, "%s%s%s", pop3_args.pop3_directory,
@@ -29,13 +28,9 @@ static int get_file_path(char path[MAX_PATH_LENGTH], char *filename) {
 
 int fill_file_array(struct selector_key *key) {
     struct client_data *data = key->data;
-    struct file_array_item *file_array_item;
     struct dirent *de;
     struct stat st;
-
     char directory[MAX_PATH_LENGTH];
-    char *path = pop3_args.pop3_directory;
-
     struct file_array_item *fileArray = calloc(1, sizeof(struct file_array_item) * MAX_EMAILS);
 
     if (fileArray == NULL)
@@ -56,7 +51,7 @@ int fill_file_array(struct selector_key *key) {
         if (de->d_type == DT_REG) {
             char filepath[MAX_PATH_LENGTH];
 
-            if (get_file_path(filepath, de->d_name) < 0)
+            if (get_file_path_user(filepath, data->user.username, de->d_name) < 0)
                 continue;
 
             fileArray[i].filename = malloc(strlen(de->d_name) + 1);
@@ -122,4 +117,30 @@ void sync_to_maildrop(struct selector_key *key) {
     } else {
         okResponse(data, "");
     }
+}
+
+bool is_file_deleted(const struct selector_key *key, const char *filename, int *index) {
+    const struct client_data *data = key->data;
+    const struct file_array_item *fileArray = data->fileArray;
+    for (int i = 0; i < data->fileArraySize; i++) {
+        if (strcmp(fileArray[i].filename, filename) == 0) {
+            *index = i;
+            return fileArray[i].deleted;
+        }
+    }
+    *index = -1;
+    log(ERROR, "File with name '%s' not found in file array", filename);
+    return true;
+}
+
+int get_file_path_user(char path[MAX_PATH_LENGTH], const char *username, const char *filename) {
+    if (get_file_path(path, username) < 0) {
+        return -1;
+    }
+    if (path[strlen(path) - 1] != '/') {
+        strcat(path, "/");
+    }
+    strcat(path, filename);
+
+    return 0;
 }

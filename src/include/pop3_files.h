@@ -32,5 +32,21 @@ void destroy_file_array(struct selector_key *key);
 
 void sync_to_maildrop(struct selector_key *key);
 
+/**
+ *  @brief Appends the filename at the end of the user maildir path:
+ *  - 'path'  -> 'path/username/filename'
+ *  - 'path/' -> 'path/username/filename'
+ *  @param path The resulting path
+ *  @param username The username
+ *  @param filename The filename
+ *  @return -1 if the resulting path is too long, 0 otherwise
+ */
+int get_file_path_user(char path[MAX_PATH_LENGTH], const char *username, const char *filename);
+
+/**
+ * @brief  Check if file is marked as deleted in file array
+ * @return bool true if the file is deleted, false otherwise
+ */
+bool is_file_deleted(const struct selector_key *key, const char *filename, int *index);
 
 #endif //TPE_PROTOS_POP3_FILES_H
