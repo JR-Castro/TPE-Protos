@@ -7,10 +7,12 @@
 #include "selector.h"
 #include "definitions.h"
 #include "pop3.h"
+#include "file_parser.h"
 
 struct file_data {
     struct buffer readBuffer;
-    // TODO: Here goes file parser
+
+    struct file_parser parser;
 
     int clientFd;
     struct client_data *clientData;

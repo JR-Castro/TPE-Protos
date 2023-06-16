@@ -265,7 +265,7 @@ static enum pop3_state executeRetr(struct selector_key *key, struct command *com
         goto handle_error;
     }
 
-    struct file_data *fileData = malloc(sizeof(struct file_data));
+    struct file_data *fileData = calloc(1, sizeof(struct file_data));
     if (fileData == NULL) {
         errResponse(data, "Could not open file");
         goto handle_error;
@@ -274,6 +274,7 @@ static enum pop3_state executeRetr(struct selector_key *key, struct command *com
     buffer_init(&fileData->readBuffer, FILE_BUFFER_SIZE, fileData->readBufferData);
     fileData->clientFd = key->fd;
     fileData->clientData = data;
+    file_parser_init(&fileData->parser);
 
 
     // TODO: Initialize file stm;

@@ -118,3 +118,8 @@ buffer_snprintf(buffer *b, const char *fmt, ...) {
 
     return count;
 }
+
+bool
+buffer_fits(buffer *b, size_t n) {
+    return b->limit - b->write >= n;
+}

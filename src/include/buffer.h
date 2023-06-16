@@ -150,4 +150,5 @@ buffer_can_write(buffer *b);
 int
 buffer_snprintf(buffer *b, const char *fmt, ...);
 
+bool buffer_fits(buffer *b, size_t nbyte);
 #endif
