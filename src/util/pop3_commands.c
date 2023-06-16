@@ -293,6 +293,8 @@ static enum pop3_state executeRetr(struct selector_key *key, struct command *com
         goto handle_error;
     }
 
+    okResponse(data, "");
+
     return POP3_FILE_WRITE;
 
     handle_error:

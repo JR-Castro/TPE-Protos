@@ -48,15 +48,13 @@ static void fileRead(struct selector_key *key) {
 
         buffer_snprintf(&data->clientData->outputBuffer, end);
 
-        if (close(key->fd) == -1) {
-            log(ERROR, "Error closing file descriptor %d", key->fd);
-            goto handle_error;
-        }
+        status = selector_unregister_fd(key->s, key->fd);
+        if (status != SELECTOR_SUCCESS) goto handle_error;
 
         data->clientData->emailFinished = true;
         data->clientData->emailFd = 0;
 
-        return;
+        goto finally;
     }
 
     buffer_write_adv(&data->readBuffer, count);
@@ -82,9 +80,9 @@ static void fileRead(struct selector_key *key) {
     // We can't read anymore, either input buffer is empty or output buffer is full
     // Wake up client to write
 
+finally:
     status = selector_set_interest(key->s, data->clientFd, OP_WRITE);
     if (status != SELECTOR_SUCCESS) goto handle_error;
-
 
 handle_error:
     return;
