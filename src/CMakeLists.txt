@@ -11,5 +11,5 @@ include_directories(${PROJECT_ROOT_DIR}/src/include/)
 # Main executable
 file(GLOB_RECURSE SOURCES "util/*.c" "parsers/*.c")
 message(STATUS "SOURCES: ${SOURCES}")
-add_executable(pop3server ${SOURCES} main.c pop3.c)
+add_executable(pop3server ${SOURCES} main.c pop3.c logger.c)
 target_link_libraries(pop3server pthread)

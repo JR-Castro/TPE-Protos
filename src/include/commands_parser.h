@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdint.h>
-#include <macros.h>
+#include "macros.h"
 #include "buffer.h"
 
 #define CMD_MAX_LENGTH 255

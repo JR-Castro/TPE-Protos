@@ -14,7 +14,7 @@
 #include "definitions.h"
 
 // TODO: Define a proper buffer size
-
+#define BUFFER_SIZE 4096
 
 struct client_data {
     struct sockaddr_storage addr;
@@ -79,7 +79,6 @@ enum pop3_state {
 };
 
 void passiveAccept(struct selector_key *key);
-
 /*
  * Automatically formats response: "-ERR %s\r\n"
  * Should use the MAX_ERROR_LENGTH macro to ensure protocol compliance

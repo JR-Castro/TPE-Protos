@@ -1,13 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
-#include <unistd.h>
 #include <sys/stat.h>
 
 #include "pop3.h"
-#include "pop3_files.h"
 #include "args.h"
-#include "emalloc.h"
 
 extern struct pop3_args pop3_args;
 
