@@ -65,7 +65,7 @@ void parse_args(const int argc, char **argv, struct pop3_args *args) {
     int c;
 
     while (true) {
-        c = getopt(argc, argv, "hl::L::p::o::u:vd::");
+        c = getopt(argc, argv, "hl::L::p::o::u:vd:");
         if (c == -1)
             break;
 
@@ -95,7 +95,7 @@ void parse_args(const int argc, char **argv, struct pop3_args *args) {
                 }
                 break;
             case 'd':
-                args->pop3_directory = argv[optind];
+                args->pop3_directory = optarg;
                 break;
             case 'v':
                 version();
@@ -107,6 +107,10 @@ void parse_args(const int argc, char **argv, struct pop3_args *args) {
         }
     }
 
+    if (args->pop3_directory == NULL) {
+        fprintf(stderr, "Argument -d is required.\n");
+        exit(1);
+    }
 
     if (optind < argc - 1) {
         fprintf(stderr, "Argument not accepted: ");
