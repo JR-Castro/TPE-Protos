@@ -111,9 +111,18 @@ static unsigned readUserCommand(struct selector_key *key) {
 
             transition = executeCommand(key, data->commandParser->command);
 
+            // TODO: We should check if output is too full, and if it's directly jump to write.
+            // Once write is complete, continue parsing and if there's still data in input buffer
+            // Parse it there and continue with the parse - send thing.
+            // Otherwise we're not actually doing pipelining.
+            // Ask Martone in case of doubt.
+
+            // Maybe simply execute the first command here and then parse the rest on writeResponse.
+
             command_parser_reset(data->commandParser);
 
             if (transition == POP3_CLOSE) return transition;
+            // TODO: See if we should flush the output buffer to the client in POP3 ERROR
             if (transition == POP3_ERROR) goto handle_error;
         }
 
@@ -171,6 +180,14 @@ handle_error:
     return POP3_ERROR;
 }
 
+static unsigned int writeFile(struct selector_key *key) {
+    return 0;
+}
+
+static void stopFileWrite(const enum pop3_state state, struct selector_key *key) {
+    // TODO: Implement
+}
+
 static const struct state_definition client_states[] = {
     {
         .state = POP3_GREETING_WRITE,
@@ -185,6 +202,11 @@ static const struct state_definition client_states[] = {
     {
         .state = POP3_WRITE,
         .on_write_ready = writeResponse,
+    },
+    {
+        .state = POP3_FILE_WRITE,
+        .on_write_ready = writeFile,
+        .on_departure = stopFileWrite,
     },
     {
         .state = POP3_CLOSE,

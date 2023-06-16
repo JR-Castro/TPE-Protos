@@ -4,13 +4,6 @@
 #include "buffer.h"
 #include "definitions.h"
 
-struct file {
-    int fd;
-    struct buffer readBuffer;
-
-
-    uint8_t readBufferData[FILE_BUFFER_SIZE];
-};
 
 struct file_array_item {
     char *filename;

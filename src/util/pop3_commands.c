@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <fcntl.h>
 
 #include "pop3_commands.h"
 #include "pop3_files.h"
@@ -6,6 +7,8 @@
 #include "users.h"
 #include "definitions.h"
 #include "logger.h"
+#include "file_handlers.h"
+#include "selector.h"
 
 struct command_function {
     char *name;
@@ -219,48 +222,85 @@ static enum pop3_state executeRset(struct selector_key *key, struct command *com
 }
 
 static enum pop3_state executeRetr(struct selector_key *key, struct command *command) {
+
+    int fileFd = -1;
+
     if (command->args1 == NULL) {
         errResponse(key->data, "Invalid arguments");
-        goto finally;
+        goto handle_error;
     }
 
     struct client_data *data = key->data;
     struct file_array_item *fa = data->fileArray;
-    const char * filename = (char *) command->args1;
+    unsigned int mailIndex = strtoul((char*)command->args1, NULL, 10);
     char filepath[MAX_PATH_LENGTH];
-    FILE * fstream;
-    int file_index = -1;
 
-    if (fa == NULL
-        || get_file_path_user(filepath, data->user.username, filename) < 0) {
+    if (mailIndex >= data->fileArraySize || fa[mailIndex].deleted) {
+        errResponse(key->data, "no such message");
+        goto handle_error;
+    }
+
+    char *filename = fa[mailIndex].filename;
+
+    if (get_file_path_user(filepath, data->user.username, filename) < 0) {
         log(ERROR, "[RETR] Error getting file path");
-        goto finally;
+        errResponse(data, "Could not get file path");
+        goto handle_error;
     }
 
-    fstream = fopen(filepath, "r");
-    if (!fstream || is_file_deleted(key, filename, &file_index)) {
-        errResponse(data, "No such message");
-        goto finally;
+    fileFd = open(filepath, O_RDONLY);
 
-    } else {
-        char aux[10];
-        char line[MAX_ONELINE_LENGTH] = {0};
-        unsigned int fp_size = fa[file_index].size;
-
-        sprintf(aux, "%u", fp_size);
-        strcat(line, aux);
-        strcat(line, " octets");
-        okResponse(data, line);
-        memset(line, 0, MAX_ONELINE_LENGTH);
-
-        while ((fgets(line, MAX_ONELINE_LENGTH, fstream)) != NULL) {
-            buffer_snprintf(&(data->outputBuffer), "%s", line);
-        }
-        buffer_snprintf(&(data->outputBuffer), "\n.\n");
-        fclose(fstream);
+    if (fileFd < 0) {
+        log(ERROR, "[RETR] Error opening file");
+        errResponse(data, "Could not open file");
+        goto handle_error;
     }
 
+    data->emailFd = fileFd;
 
-finally:
+    // TODO: Handle ourselves on each read? or simply fail?
+    if (selector_fd_set_nio(fileFd) < 0) {
+        log(ERROR, "[RETR] Error setting file descriptor to non-blocking");
+        errResponse(data, "Could not open file");
+        goto handle_error;
+    }
+
+    struct file_data *fileData = malloc(sizeof(struct file_data));
+    if (fileData == NULL) {
+        errResponse(data, "Could not open file");
+        goto handle_error;
+    }
+
+    buffer_init(&fileData->readBuffer, FILE_BUFFER_SIZE, fileData->readBufferData);
+    fileData->clientFd = key->fd;
+    fileData->clientData = data;
+
+
+    // TODO: Initialize file stm;
+
+    selector_status selectorStatus = selector_register(key->s, fileFd, get_file_handlers(), OP_READ, fileData);
+
+    if (selectorStatus != SELECTOR_SUCCESS) {
+        errResponse(data, "Could not open file");
+        goto handle_error;
+    }
+
+    // Wait for file read to wake me
+    selectorStatus = selector_set_interest_key(key, OP_NOOP);
+    if (selectorStatus != SELECTOR_SUCCESS) {
+        errResponse(data, "Could not open file");
+        goto handle_error;
+    }
+
+    return POP3_FILE_WRITE;
+
+    handle_error:
+    if (fileFd != -1) {
+        close(fileFd);
+        data->emailFd = 0;
+        if (selector_unregister_fd(key->s, fileFd) != SELECTOR_SUCCESS)
+            free(fileData);
+    }
+
     return POP3_WRITE;
 }
