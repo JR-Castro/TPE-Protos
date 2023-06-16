@@ -2,7 +2,6 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 
 #include "parser_utils.h"
 

@@ -1,5 +1,6 @@
 #include "util.h"
 
+#include <stdbool.h>
 
 bool isAlphanum(uint8_t c) {
     return ((c >= 'A' && c <= 'Z') ||
