@@ -28,7 +28,7 @@ static void fileRead(struct selector_key *key) {
     if (count < 0) goto handle_error;
 
     // EOF
-    if (count == 0) {
+    if (count == 0 && limit != 0) {
         // Send .CRLF to client since we reached EOF
         char *end = NULL;
         switch (data->parser.state) {
@@ -82,6 +82,9 @@ static void fileRead(struct selector_key *key) {
 
 finally:
     status = selector_set_interest(key->s, data->clientFd, OP_WRITE);
+    if (status != SELECTOR_SUCCESS) goto handle_error;
+    // Wait for client to wake us up
+    status = selector_set_interest_key(key, OP_NOOP);
     if (status != SELECTOR_SUCCESS) goto handle_error;
 
 handle_error:

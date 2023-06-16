@@ -166,7 +166,7 @@ static enum pop3_state executeList(struct selector_key *key, struct command *com
     for (int i = 0; i < data->fileArraySize; ++i) {
         if (!data->fileArray[i].deleted) {
             char response[MAX_ONELINE_LENGTH];
-            snprintf(response, MAX_ONELINE_LENGTH, "%u %u", i, data->fileArray[i].size);
+            snprintf(response, MAX_ONELINE_LENGTH, "%u %u", data->fileArray[i].num, data->fileArray[i].size);
             normalResponse(data, response);
             sent++;
         }
@@ -232,7 +232,8 @@ static enum pop3_state executeRetr(struct selector_key *key, struct command *com
 
     struct client_data *data = key->data;
     struct file_array_item *fa = data->fileArray;
-    unsigned int mailIndex = strtoul((char*)command->args1, NULL, 10);
+    // Number sent to user for first mail is 1, but index in array is 0
+    unsigned int mailIndex = strtoul((char*)command->args1, NULL, 10) - 1;
     char filepath[MAX_PATH_LENGTH];
 
     if (mailIndex >= data->fileArraySize || fa[mailIndex].deleted) {

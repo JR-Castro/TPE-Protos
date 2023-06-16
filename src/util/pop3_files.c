@@ -60,7 +60,8 @@ int fill_file_array(struct selector_key *key) {
             stat(filepath, &st);
             totalSize += st.st_size;
 
-            fileArray[i].num = i;
+            // First message has index 1
+            fileArray[i].num = i+1;
             fileArray[i].deleted = false;
             fileArray[i].size = st.st_size;
             i++;
@@ -120,20 +121,6 @@ void sync_to_maildrop(struct selector_key *key) {
     } else {
         okResponse(data, "");
     }
-}
-
-bool is_file_deleted(const struct selector_key *key, const char *filename, int *index) {
-    const struct client_data *data = key->data;
-    const struct file_array_item *fileArray = data->fileArray;
-    for (int i = 0; i < data->fileArraySize; i++) {
-        if (strcmp(fileArray[i].filename, filename) == 0) {
-            *index = i;
-            return fileArray[i].deleted;
-        }
-    }
-    *index = -1;
-    log(ERROR, "File with name '%s' not found in file array", filename);
-    return true;
 }
 
 int get_file_path_user(char path[MAX_PATH_LENGTH], const char *username, const char *filename) {

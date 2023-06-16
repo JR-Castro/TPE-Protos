@@ -206,7 +206,6 @@ static unsigned int writeFile(struct selector_key *key) {
 
     if (data->emailFinished) {
         if (buffer_can_read(&data->inputBuffer)) {
-            // TODO: Consume input buffer and depending on parser state, go to POP3_READ or POP3_WRITE
             transition = feedInputToParser(key, data);
             switch (transition) {
                 case POP3_READ:
@@ -225,6 +224,8 @@ static unsigned int writeFile(struct selector_key *key) {
     }
 
     // We don't have anything else to write but file didn't finish, so we need to wait for file to read more
+    status = selector_set_interest(key->s, data->emailFd, OP_READ);
+    if (status != SELECTOR_SUCCESS) goto handle_error;
     status = selector_set_interest_key(key, OP_NOOP);
     if (status != SELECTOR_SUCCESS) goto handle_error;
     return POP3_FILE_WRITE;
