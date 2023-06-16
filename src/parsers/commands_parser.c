@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "logger.h"
 #include "emalloc.h"
+#include "commands_parser.h"
 
 ////////////////////////////////////////////////////////////
 // STATIC FUNCTIONS
