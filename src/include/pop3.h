@@ -12,9 +12,7 @@
 #include "pop3_commands.h"
 #include "pop3_files.h"
 #include "definitions.h"
-
-// TODO: Define a proper buffer size
-
+#include "file_handlers.h"
 
 struct client_data {
     struct sockaddr_storage addr;
@@ -37,7 +35,8 @@ struct client_data {
     struct file_array_item *fileArray;
     unsigned int fileArraySize;
     unsigned int totalMailSize;
-    struct file *email;
+    int emailFd;
+    bool emailFinished;
 
     char error[MAX_ERROR_LENGTH];
 };
@@ -74,6 +73,16 @@ enum pop3_state {
      *      -POP3_ERROR             if error occurred
      */
     POP3_WRITE,
+    /*
+     *  Writes the result of a RETR to the client
+     *  Interests: WRITE
+     *
+     *  Transitions:
+     *    - POP3_READ               if file finished
+     *    - POP3_FILE_WRITE         if file not finished
+     *    - POP3_ERROR              if error occurred
+     */
+    POP3_FILE_WRITE,
     POP3_CLOSE,
     POP3_ERROR,
 };

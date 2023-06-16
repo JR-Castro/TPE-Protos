@@ -61,3 +61,10 @@ add_executable(
         ${CTEST_SOURCE_DIRECTORY}/../src/util/users.c)
 target_link_libraries(users_test check m)
 add_test(NAME users_test COMMAND users_test)
+
+## BUFFER TEST
+add_executable(
+        buffer_test
+        ${CTEST_SOURCE_DIRECTORY}/buffer_test.c)
+target_link_libraries(buffer_test check m)
+add_test(NAME buffer_test COMMAND buffer_test)
