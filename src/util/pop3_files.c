@@ -102,7 +102,10 @@ void sync_to_maildrop(struct selector_key *key) {
         if (fa[i].deleted) {
             char filepath[MAX_PATH_LENGTH];
 
-            snprintf(filepath, MAX_PATH_LENGTH, "%s/%s", directory, fa[i].filename);
+            if (snprintf(filepath, MAX_PATH_LENGTH, "%.*s/%s", MAX_PATH_LENGTH - 1, directory, fa[i].filename) > MAX_PATH_LENGTH) {
+                ret--; // unlink returns -1 on error.
+                continue;
+            }
 
             ret += unlink(filepath);
             if (ret < 0) {

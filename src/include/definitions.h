@@ -9,6 +9,7 @@
 #define MAX_ERROR_LENGTH 250
 // 255 - 3 ("+OK") - 2 + 1 = 251
 #define MAX_ONELINE_LENGTH 251
+#define BUFFER_FREE_SPACE 255
 
 // Used in pop3_files.h
 #define FILE_BUFFER_SIZE 4096

@@ -30,7 +30,6 @@ static void fileRead(struct selector_key *key) {
     // EOF
     if (count == 0) {
         // Send .CRLF to client since we reached EOF
-        // Maybe check parser state to see if file finished with \r\n
         char *end = NULL;
         switch (data->parser.state) {
             case NORMAL:
@@ -47,10 +46,15 @@ static void fileRead(struct selector_key *key) {
                 break;
         }
 
+        buffer_snprintf(&data->clientData->outputBuffer, end);
+
         if (close(key->fd) == -1) {
             log(ERROR, "Error closing file descriptor %d", key->fd);
             goto handle_error;
         }
+
+        data->clientData->emailFinished = true;
+        data->clientData->emailFd = 0;
 
         return;
     }
