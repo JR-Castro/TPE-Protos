@@ -1,6 +1,4 @@
-#include "../include/emalloc.h"
-#include "../include/logger.h"
-#include "../include/logger.h"
+#include "emalloc.h"
 
 #include <stdlib.h>
 #include <stdio.h>

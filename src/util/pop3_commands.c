@@ -1,10 +1,6 @@
 #include <stdio.h>
 
-#include "../include/pop3_commands.h"
-#include "../include/pop3_files.h"
-#include "../include/pop3.h"
-#include "../include/users.h"
-#include "../include/definitions.h"
+#include "pop3_commands.h"
 
 struct command_function {
     char *name;

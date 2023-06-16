@@ -8,10 +8,10 @@
 #include <errno.h>
 #include <arpa/inet.h>
 
-#include "include/selector.h"
-#include "include/pop3.h"
-#include "include/args.h"
-#include "include/logger.h"
+#include "selector.h"
+#include "pop3.h"
+#include "args.h"
+#include "logger.h"
 
 #define MAX_CON 3
 #define SELECTOR_SIZE 1024

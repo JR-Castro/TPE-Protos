@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "include/logger.h"
+#include "logger.h"
 
 LOG_LEVEL current_level = DEBUG;
 

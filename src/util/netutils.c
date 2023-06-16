@@ -5,10 +5,9 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <unistd.h>
 #include <arpa/inet.h>
 
-#include "../include/netutils.h"
+#include "netutils.h"
 
 //Patch for MacOS
 #ifndef MSG_NOSIGNAL

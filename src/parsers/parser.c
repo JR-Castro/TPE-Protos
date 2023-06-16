@@ -3,10 +3,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 
-#include "../include/parser.h"
-#include <util.h>
+#include "parser.h"
 
 /* CDT del parser */
 struct parser {

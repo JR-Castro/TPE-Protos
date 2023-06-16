@@ -1,7 +1,6 @@
 #include <string.h>
 
-#include "../include/users.h"
-#include "../include/definitions.h"
+#include "users.h"
 
 static struct user users[MAX_USERS];
 static size_t users_count = 0;

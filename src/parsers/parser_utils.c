@@ -2,9 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 
-#include "../include/parser_utils.h"
+#include "parser_utils.h"
 
 const char *
 parser_utils_strcmpi_event(const enum string_cmp_event_types type) {

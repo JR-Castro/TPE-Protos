@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/socket.h>
-#include "include/pop3.h"
-#include "include/logger.h"
+#include "pop3.h"
+#include "logger.h"
 
 //Patch for MacOS
 #ifndef MSG_NOSIGNAL

@@ -15,8 +15,8 @@
 #include <sys/select.h>
 #include <sys/signal.h>
 #include <signal.h>
-#include "../include/selector.h"
-#include "../include/logger.h"
+#include "selector.h"
+#include "logger.h"
 
 #define N(x) (sizeof(x)/sizeof((x)[0]))
 
