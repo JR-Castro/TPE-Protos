@@ -130,7 +130,8 @@ int get_file_path_user(char path[MAX_PATH_LENGTH], const char *username, const c
     if (path[strlen(path) - 1] != '/') {
         strcat(path, "/");
     }
-    strcat(path, filename);
+    size_t length = strlen(path);
+    strncat(path, filename, MAX_PATH_LENGTH - length - 1);
 
     return 0;
 }
