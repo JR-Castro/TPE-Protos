@@ -158,23 +158,37 @@ static enum pop3_state executeStat(struct selector_key *key, struct command *com
 
 static enum pop3_state executeList(struct selector_key *key, struct command *command) {
     struct client_data *data = key->data;
+    char response[MAX_ONELINE_LENGTH];
 
-    okResponse(data, "");
-
-    int sent = 0;
-
-    for (int i = 0; i < data->fileArraySize; ++i) {
-        if (!data->fileArray[i].deleted) {
-            char response[MAX_ONELINE_LENGTH];
-            snprintf(response, MAX_ONELINE_LENGTH, "%u %u", data->fileArray[i].num, data->fileArray[i].size);
-            normalResponse(data, response);
-            sent++;
+    if (command->args1 == NULL) {
+        okResponse(data, "Listing mails");
+        for (int i = 0; i < data->fileArraySize; ++i) {
+            if (!data->fileArray[i].deleted) {
+                ;
+                snprintf(response, MAX_ONELINE_LENGTH, "%u %u", data->fileArray[i].num, data->fileArray[i].size);
+                normalResponse(data, response);
+            }
         }
+        normalResponse(data, ".");
+    } else {
+        unsigned int mailIndex = strtoul((char*)command->args1, NULL, 10) - 1;
+
+        if (mailIndex >= data->fileArraySize) {
+            errResponse(data, "Invalid mail index");
+            goto finally;
+        }
+
+        if (data->fileArray[mailIndex].deleted) {
+            errResponse(data, "Mail already deleted");
+            goto finally;
+        }
+
+        snprintf(response, MAX_ONELINE_LENGTH, "%u %u", data->fileArray[mailIndex].num, data->fileArray[mailIndex].size);
+        okResponse(data, response);
     }
 
-    normalResponse(data, ".");
-
-    return sent ? POP3_WRITE : POP3_READ;
+    finally:
+    return POP3_WRITE;
 }
 
 static enum pop3_state executeDele(struct selector_key *key, struct command *command) {
