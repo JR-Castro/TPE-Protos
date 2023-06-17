@@ -12,6 +12,7 @@
 #include "pop3.h"
 #include "args.h"
 #include "logger.h"
+#include "metrics.h"
 
 #define MAX_CON 3
 #define SELECTOR_SIZE 1024
@@ -38,6 +39,7 @@ int main(const int argc, char **argv) {
 
     int ret = -1;
 
+    metrics_init();
 
     const struct selector_init init = {
             .signal = SIGALRM,
