@@ -242,6 +242,8 @@ static enum pop3_state executeRetr(struct selector_key *key, struct command *com
     }
 
     char *filename = fa[mailIndex].filename;
+    char octets[MAX_ONELINE_LENGTH - 6];
+    sprintf(octets, "%u octets", fa[mailIndex].size);
 
     if (get_file_path_user(filepath, data->user.username, filename) < 0) {
         log(ERROR, "[RETR] Error getting file path");
@@ -294,7 +296,7 @@ static enum pop3_state executeRetr(struct selector_key *key, struct command *com
         goto handle_error;
     }
 
-    okResponse(data, "");
+    okResponse(data, octets);
 
     return POP3_FILE_WRITE;
 
