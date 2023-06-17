@@ -103,3 +103,23 @@ buffer_compact(buffer *b) {
         b->write = b->data + n;
     }
 }
+
+int
+buffer_snprintf(buffer *b, const char *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    size_t limit;
+    uint8_t *buffer;
+    int count;
+    buffer = buffer_write_ptr(b, &limit);
+    count = vsnprintf((char *) buffer, limit, fmt, args);
+    buffer_write_adv(b, count);
+    va_end(args);
+
+    return count;
+}
+
+bool
+buffer_fits(buffer *b, size_t n) {
+    return b->limit - b->write >= n;
+}

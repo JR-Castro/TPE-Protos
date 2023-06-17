@@ -1,6 +1,14 @@
 #include <stdio.h>
+#include <fcntl.h>
 
 #include "pop3_commands.h"
+#include "pop3_files.h"
+#include "pop3.h"
+#include "users.h"
+#include "definitions.h"
+#include "logger.h"
+#include "file_handlers.h"
+#include "selector.h"
 
 struct command_function {
     char *name;
@@ -121,12 +129,14 @@ static enum pop3_state executePass(struct selector_key *key, struct command *com
 static enum pop3_state executeQuit(struct selector_key *key, struct command *command) {
     struct client_data *data = key->data;
 
-    /*if (data->isLoggedIn) {
+    if (data->isLoggedIn) {
         // SYNC CHANGES TO FILE SYSTEM
-    }*/
+        sync_to_maildrop(key);
+    } else {
+        okResponse(data, "Bye");
+    }
 
     data->closed = true;
-    okResponse(data, "Bye");
 
     return POP3_WRITE;
 }
@@ -140,28 +150,163 @@ static enum pop3_state executeStat(struct selector_key *key, struct command *com
     }
 
     char response[MAX_ONELINE_LENGTH];
-    snprintf(response, MAX_ONELINE_LENGTH, "%d %d", data->fileArraySize, data->totalMailSize);
+    snprintf(response, MAX_ONELINE_LENGTH, "%d %u", data->fileArraySize, data->totalMailSize);
     okResponse(data, response);
 
     return POP3_WRITE;
 }
 
 static enum pop3_state executeList(struct selector_key *key, struct command *command) {
-    errResponse(key->data, "Not implemented");
-    return POP3_WRITE;
+    struct client_data *data = key->data;
+
+    okResponse(data, "");
+
+    int sent = 0;
+
+    for (int i = 0; i < data->fileArraySize; ++i) {
+        if (!data->fileArray[i].deleted) {
+            char response[MAX_ONELINE_LENGTH];
+            snprintf(response, MAX_ONELINE_LENGTH, "%u %u", data->fileArray[i].num, data->fileArray[i].size);
+            normalResponse(data, response);
+            sent++;
+        }
+    }
+
+    normalResponse(data, ".");
+
+    return sent ? POP3_WRITE : POP3_READ;
 }
 
 static enum pop3_state executeDele(struct selector_key *key, struct command *command) {
-    errResponse(key->data, "Not implemented");
+
+    struct client_data *data = key->data;
+
+    if (command->args1 == NULL) {
+        errResponse(key->data, "Invalid arguments");
+        goto finally;
+    }
+
+    unsigned int mailIndex = strtoul((char*)command->args1, NULL, 10);
+
+    if (mailIndex >= data->fileArraySize) {
+        errResponse(key->data, "Invalid mail index");
+        goto finally;
+    }
+
+    if (data->fileArray[mailIndex].deleted) {
+        errResponse(key->data, "Mail already deleted");
+        goto finally;
+    }
+
+    data->fileArray[mailIndex].deleted = true;
+    char response[MAX_ONELINE_LENGTH];
+    snprintf(response, MAX_ONELINE_LENGTH, "Message %u deleted", mailIndex);
+    okResponse(key->data, response);
+
+finally:
     return POP3_WRITE;
 }
 
 static enum pop3_state executeRset(struct selector_key *key, struct command *command) {
-    errResponse(key->data, "Not implemented");
+    struct client_data *data = key->data;
+
+    for (int i = 0; i < data->fileArraySize; ++i) {
+        data->fileArray[i].deleted = false;
+    }
+
+    char response[MAX_ONELINE_LENGTH];
+    snprintf(response, MAX_ONELINE_LENGTH, "Maildrop has %u messages (%u octets)", data->fileArraySize, data->totalMailSize);
+    okResponse(key->data, response);
+
     return POP3_WRITE;
 }
 
 static enum pop3_state executeRetr(struct selector_key *key, struct command *command) {
-    errResponse(key->data, "Not implemented");
+
+    int fileFd = -1;
+
+    if (command->args1 == NULL) {
+        errResponse(key->data, "Invalid arguments");
+        goto handle_error;
+    }
+
+    struct client_data *data = key->data;
+    struct file_array_item *fa = data->fileArray;
+    // Number sent to user for first mail is 1, but index in array is 0
+    unsigned int mailIndex = strtoul((char*)command->args1, NULL, 10) - 1;
+    char filepath[MAX_PATH_LENGTH];
+
+    if (mailIndex >= data->fileArraySize || fa[mailIndex].deleted) {
+        errResponse(key->data, "no such message");
+        goto handle_error;
+    }
+
+    char *filename = fa[mailIndex].filename;
+    char octets[MAX_ONELINE_LENGTH - 6];
+    sprintf(octets, "%u octets", fa[mailIndex].size);
+
+    if (get_file_path_user(filepath, data->user.username, filename) < 0) {
+        log(ERROR, "[RETR] Error getting file path");
+        errResponse(data, "Could not get file path");
+        goto handle_error;
+    }
+
+    fileFd = open(filepath, O_RDONLY);
+
+    if (fileFd < 0) {
+        log(ERROR, "[RETR] Error opening file");
+        errResponse(data, "Could not open file");
+        goto handle_error;
+    }
+
+    data->emailFd = fileFd;
+
+    // TODO: Handle ourselves on each read? or simply fail?
+    if (selector_fd_set_nio(fileFd) < 0) {
+        log(ERROR, "[RETR] Error setting file descriptor to non-blocking");
+        errResponse(data, "Could not open file");
+        goto handle_error;
+    }
+
+    struct file_data *fileData = calloc(1, sizeof(struct file_data));
+    if (fileData == NULL) {
+        errResponse(data, "Could not open file");
+        goto handle_error;
+    }
+
+    buffer_init(&fileData->readBuffer, FILE_BUFFER_SIZE, fileData->readBufferData);
+    fileData->clientFd = key->fd;
+    fileData->clientData = data;
+    file_parser_init(&fileData->parser);
+
+
+    // TODO: Initialize file stm;
+
+    selector_status selectorStatus = selector_register(key->s, fileFd, get_file_handlers(), OP_READ, fileData);
+
+    if (selectorStatus != SELECTOR_SUCCESS) {
+        errResponse(data, "Could not open file");
+        goto handle_error;
+    }
+
+    // Wait for file read to wake me
+    selectorStatus = selector_set_interest_key(key, OP_NOOP);
+    if (selectorStatus != SELECTOR_SUCCESS) {
+        errResponse(data, "Could not open file");
+        goto handle_error;
+    }
+
+    okResponse(data, octets);
+
+    return POP3_FILE_WRITE;
+
+    handle_error:
+    if (fileFd != -1) {
+        close(fileFd);
+        data->emailFd = 0;
+        if (selector_unregister_fd(key->s, fileFd) != SELECTOR_SUCCESS)
+            free(fileData);
+    }
+
     return POP3_WRITE;
 }

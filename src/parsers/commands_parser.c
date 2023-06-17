@@ -69,6 +69,7 @@ static enum command_state command_parser_feed(struct command_parser *p, uint8_t 
                 reset_command_parser(p);
             } else if (p->state == CMD_OK) {
                 p->command->data[p->bytes-2] = '\0';
+                p->command->data[p->bytes-1] = '\0';
             }
             p->prev_state = CMD_CRLF;
             break;

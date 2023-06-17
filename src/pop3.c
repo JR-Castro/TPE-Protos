@@ -3,12 +3,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/socket.h>
+
 #include "pop3.h"
 #include "logger.h"
 
 //Patch for MacOS
 #ifndef MSG_NOSIGNAL
-#define MSG_NOSIGNAL 0
+#define MSG_NOSIGNAL 0x4000
 #endif
 
 static unsigned greetClient(struct selector_key *key) {
@@ -40,19 +41,6 @@ handle_error:
     return POP3_ERROR;
 }
 
-static void setupCommandParser(const unsigned state, struct selector_key *key) {
-    struct client_data *data = key->data;
-
-    data->commandParser = command_parser_init();
-}
-
-static void destroyCommandParser(const unsigned state, struct selector_key *key) {
-    struct client_data *data = key->data;
-
-    command_parser_destroy(data->commandParser);
-    data->commandParser = NULL;
-};
-
 void errResponse(struct client_data *data, const char *msg) {
     size_t limit;
     uint8_t *buffer;
@@ -73,22 +61,19 @@ void okResponse(struct client_data *data, const char *msg) {
     buffer_write_adv(&data->outputBuffer, count);
 }
 
-static unsigned readUserCommand(struct selector_key *key) {
-    struct client_data *data = key->data;
+void normalResponse(struct client_data *data, const char *msg) {
+    size_t limit;
+    uint8_t *buffer;
+    ssize_t count;
 
-    size_t limit;       // Max we can read from buffer
-    ssize_t count;      // How much we actually read from buffer
-    uint8_t *buffer;    // Pointer to read position in buffer
-    selector_status status;
+    buffer = buffer_write_ptr(&data->outputBuffer, &limit);
+    count = snprintf((char *) buffer, limit, "%s\r\n", msg);
+    buffer_write_adv(&data->outputBuffer, count);
+}
 
-    buffer = buffer_write_ptr(&data->inputBuffer, &limit);
-    count = recv(key->fd, buffer, limit, MSG_NOSIGNAL);
-
-    if (count <= 0) goto handle_error;
-
-    buffer_write_adv(&data->inputBuffer, count);
-
-    while (buffer_can_read(&data->inputBuffer)) {
+static enum pop3_state feedInputToParser(struct selector_key *key, struct client_data *data) {
+    enum pop3_state transition;
+    while (buffer_can_read(&data->inputBuffer) && buffer_fits(&data->outputBuffer, BUFFER_FREE_SPACE)) {
         enum command_state commandState = parse_byte_command(&data->inputBuffer, data->commandParser);
 
         if (commandState == CMD_OK) {
@@ -97,26 +82,57 @@ static unsigned readUserCommand(struct selector_key *key) {
             // IF COMMAND IS QUIT, GO TO POP3_CLOSE
             // IF COMMAND IS OK OR INVALID, GO TO POP3_WRITE
 
-            enum pop3_state transition = executeCommand(key, data->commandParser->command);
+            transition = executeCommand(key, data->commandParser->command);
+
+            // TODO: We should check if output is too full, and if it's directly jump to write.
+            // Once write is complete, continue parsing and if there's still data in input buffer
+            // Parse it there and continue with the parse - send thing.
+            // Otherwise we're not actually doing pipelining.
+            // Ask Martone in case of doubt.
+
+            // Maybe simply execute the first command here and then parse the rest on writeResponse.
 
             command_parser_reset(data->commandParser);
 
-            if (transition == POP3_CLOSE) return transition;
-            if (transition == POP3_ERROR) goto handle_error;
+            return transition;
         }
 
         if (commandState == CMD_INVALID) {
             errResponse(data, "Invalid command");
-
-            status = selector_set_interest_key(key, OP_WRITE);
-            if (status != SELECTOR_SUCCESS) goto handle_error;
             return POP3_WRITE;
         };
     }
+    return POP3_READ;
+}
 
-    status = selector_set_interest_key(key, OP_WRITE);
-    if (status != SELECTOR_SUCCESS) goto handle_error;
-    return POP3_WRITE;
+static unsigned readUserCommand(struct selector_key *key) {
+    struct client_data *data = key->data;
+
+    size_t limit;       // Max we can read from buffer
+    ssize_t count;      // How much we actually read from buffer
+    uint8_t *buffer;    // Pointer to read position in buffer
+    selector_status status;
+    enum pop3_state transition;
+
+    buffer = buffer_write_ptr(&data->inputBuffer, &limit);
+    count = recv(key->fd, buffer, limit, MSG_NOSIGNAL);
+
+    if (count <= 0 && limit != 0) goto handle_error;
+
+    buffer_write_adv(&data->inputBuffer, count);
+
+    transition = feedInputToParser(key, data);
+
+    switch (transition) {
+        case POP3_WRITE:
+            status = selector_set_interest_key(key, OP_WRITE);
+            if (status != SELECTOR_SUCCESS) goto handle_error;
+            return POP3_WRITE;
+        case POP3_ERROR:
+            goto handle_error;
+        default:
+            return transition;
+    }
 
 handle_error:
     selector_set_interest_key(key, OP_NOOP);
@@ -131,6 +147,7 @@ static unsigned writeResponse(struct selector_key *key) {
     ssize_t count;      // How much we actually read from buffer
     uint8_t *buffer;    // Pointer to read position in buffer
     selector_status status;
+    enum pop3_state transition;
 
     buffer = buffer_read_ptr(&data->outputBuffer, &limit);
     count = send(key->fd, buffer, limit, MSG_NOSIGNAL);
@@ -139,20 +156,88 @@ static unsigned writeResponse(struct selector_key *key) {
 
     buffer_read_adv(&data->outputBuffer, count);
 
+    // We sent the response to quit and close the connection
+    if (data->closed)
+        return POP3_CLOSE;
+
     if (buffer_can_read(&data->outputBuffer)) {
         return POP3_WRITE;
     }
 
-    status = selector_set_interest_key(key, OP_READ);
+    transition = feedInputToParser(key, data);
 
-    if (status != SELECTOR_SUCCESS) goto handle_error;
-
-    return data->closed ? POP3_CLOSE : POP3_READ;
+    switch (transition) {
+        case POP3_READ:
+            status = selector_set_interest_key(key, OP_READ);
+            if (status != SELECTOR_SUCCESS) goto handle_error;
+            return POP3_READ;
+        case POP3_ERROR:
+            goto handle_error;
+        default:
+            return transition;
+    }
 
 handle_error:
 
-    status = selector_set_interest_key(key, OP_NOOP);
+    selector_set_interest_key(key, OP_NOOP);
     return POP3_ERROR;
+}
+
+static unsigned int writeFile(struct selector_key *key) {
+    struct client_data *data = key->data;
+
+    size_t limit;               // Max we can read from buffer
+    ssize_t count;              // How much we actually read from buffer
+    uint8_t *buffer;            // Pointer to read position in buffer
+    selector_status status;
+    enum pop3_state transition;
+
+    buffer = buffer_read_ptr(&data->outputBuffer, &limit);
+    count = send(key->fd, buffer, limit, MSG_NOSIGNAL);
+
+    if (count < 0 && limit != 0) goto handle_error;
+
+    buffer_read_adv(&data->outputBuffer, count);
+
+    if (buffer_can_read(&data->outputBuffer)) {
+        // There's still more to send.
+        return POP3_FILE_WRITE;
+    }
+
+    if (data->emailFinished) {
+        if (buffer_can_read(&data->inputBuffer)) {
+            transition = feedInputToParser(key, data);
+            switch (transition) {
+                case POP3_READ:
+                    status = selector_set_interest_key(key, OP_READ);
+                    if (status != SELECTOR_SUCCESS) goto handle_error;
+                    return POP3_READ;
+                default:
+                    return transition;
+            }
+        }
+
+        // Email finished and no more to send to user, read next command.
+        status = selector_set_interest_key(key, OP_READ);
+        if (status != SELECTOR_SUCCESS) goto handle_error;
+        return POP3_READ;
+    }
+
+    // We don't have anything else to write but file didn't finish, so we need to wait for file to read more
+    status = selector_set_interest(key->s, data->emailFd, OP_READ);
+    if (status != SELECTOR_SUCCESS) goto handle_error;
+    status = selector_set_interest_key(key, OP_NOOP);
+    if (status != SELECTOR_SUCCESS) goto handle_error;
+    return POP3_FILE_WRITE;
+
+handle_error:
+    selector_set_interest_key(key, OP_NOOP);
+    return POP3_ERROR;
+}
+
+static void stopFileWrite(const enum pop3_state state, struct selector_key *key) {
+    struct client_data *data = key->data;
+    data->emailFinished = false;
 }
 
 static const struct state_definition client_states[] = {
@@ -162,13 +247,16 @@ static const struct state_definition client_states[] = {
     },
     {
         .state = POP3_READ,
-        .on_arrival = setupCommandParser,         // Setup parser for auth requests?
-        .on_departure = destroyCommandParser,       // Free parser for auth requests?
         .on_read_ready = readUserCommand,
     },
     {
         .state = POP3_WRITE,
         .on_write_ready = writeResponse,
+    },
+    {
+        .state = POP3_FILE_WRITE,
+        .on_write_ready = writeFile,
+        .on_departure = stopFileWrite,
     },
     {
         .state = POP3_CLOSE,
@@ -285,6 +373,7 @@ void passiveAccept(struct selector_key *key) {
     data->stm.initial = POP3_GREETING_WRITE;
     data->stm.max_state = POP3_ERROR;
     data->stm.states = client_states;
+    data->commandParser = command_parser_init();
 
     stm_init(&data->stm);
 
