@@ -54,10 +54,10 @@ usage(const char *progname)
 void parse_args(const int argc, char **argv, struct pop3_args *args) {
     memset(args, 0, sizeof(*args)); // sobre todo para setear en null los punteros de user
 
-    args->pop3_addr = "0.0.0.0";
+    args->pop3_addr = "::";
     args->pop3_port = 1110;
 
-    args->mng_addr = "127.0.0.1";
+    args->mng_addr = "::";
     args->mng_port = 9090;
 
     args->origin_port = 110;
