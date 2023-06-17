@@ -59,7 +59,7 @@ int main(const int argc, char **argv) {
     serverSocket = setupSocket((pop3_args.pop3_addr == NULL) ? "::" : pop3_args.pop3_addr,pop3_args.pop3_port);
     if (serverSocket == -1) goto finally;
 
-    managementSocket = setupManagementSocket((pop3_args.mng_addr == NULL) ? "::" : pop3_args.mng_addr,pop3_args.mng_port);
+    managementSocket = setupManagementSocket((pop3_args.mng_addr == NULL) ? "::1" : pop3_args.mng_addr,pop3_args.mng_port);
     if (managementSocket == -1) goto finally;
 
     signal(SIGTERM, sigterm_handler);
@@ -172,6 +172,8 @@ static int setupSocket(char *addr, int port) {
         goto handle_error;
     }
 
+    log(INFO, "Listening on %s:%d", addr, port)
+
     return newSocket;
 
     handle_error:
@@ -191,13 +193,26 @@ static int setupManagementSocket(char *addr, int port) {
     }
 
     newSocket = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
-
     if (newSocket < 0) {
         log(ERROR, "Error creating management socket: %s", strerror(errno));
         goto handle_error;
     }
 
-    log(INFO, "Listening on %s:%d for management", addr, port);
+    if (setsockopt(newSocket,
+                        SOL_SOCKET,
+                        SO_REUSEADDR,
+                        &(int) {1},
+                        sizeof(int)) < 0) {
+        log(INFO, "Error setting management socket options: %s", strerror(errno));
+    }
+
+    if (setsockopt(newSocket,
+                   IPPROTO_IPV6,
+                   IPV6_V6ONLY,
+                   &(int) {0},
+                   sizeof(int)) < 0) {
+        log(INFO, "Error setting management socket options: %s", strerror(errno));
+    }
 
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin6_family = AF_INET6;
@@ -215,6 +230,8 @@ static int setupManagementSocket(char *addr, int port) {
         log(ERROR, "Error binding management socket: %s", strerror(errno));
         goto handle_error;
     }
+
+    log(INFO, "Listening on %s:%d for management", addr, port);
 
     return newSocket;
     handle_error:
