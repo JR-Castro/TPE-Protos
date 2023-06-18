@@ -6,11 +6,18 @@
 
 #include "pop3.h"
 #include "logger.h"
+#include "metrics.h"
 
 //Patch for MacOS
 #ifndef MSG_NOSIGNAL
 #define MSG_NOSIGNAL 0x4000
 #endif
+
+ssize_t sendMetrics(int fd, const void *buf, size_t n, int flags) {
+    ssize_t count = send(fd, buf, n, flags);
+    metricsBytesSent(count);
+    return count;
+}
 
 static unsigned greetClient(struct selector_key *key) {
     struct client_data *data = key->data;
@@ -21,7 +28,7 @@ static unsigned greetClient(struct selector_key *key) {
     selector_status status;
 
     buffer = buffer_read_ptr(&data->outputBuffer, &limit);
-    count = send(key->fd, buffer, limit, MSG_NOSIGNAL);
+    count = sendMetrics(key->fd, buffer, limit, MSG_NOSIGNAL);
 
     if (count <= 0) goto handle_error;
 
@@ -150,7 +157,7 @@ static unsigned writeResponse(struct selector_key *key) {
     enum pop3_state transition;
 
     buffer = buffer_read_ptr(&data->outputBuffer, &limit);
-    count = send(key->fd, buffer, limit, MSG_NOSIGNAL);
+    count = sendMetrics(key->fd, buffer, limit, MSG_NOSIGNAL);
 
     if (count <= 0 && limit != 0) goto handle_error;
 
@@ -193,7 +200,7 @@ static unsigned int writeFile(struct selector_key *key) {
     enum pop3_state transition;
 
     buffer = buffer_read_ptr(&data->outputBuffer, &limit);
-    count = send(key->fd, buffer, limit, MSG_NOSIGNAL);
+    count = sendMetrics(key->fd, buffer, limit, MSG_NOSIGNAL);
 
     if (count < 0 && limit != 0) goto handle_error;
 
@@ -285,6 +292,8 @@ static void closeConnection(struct selector_key *key) {
     }
 
     free(data);
+
+    metricsConnectionClosed();
 }
 
 /* Handlers for the selector events, so we can wrap the state machine calls */
@@ -348,8 +357,6 @@ void passiveAccept(struct selector_key *key) {
 
     if (clientSocket == -1) goto handle_error;
 
-    // TODO: Client data and state
-
     data = calloc(1, sizeof(struct client_data));
 
     if (data == NULL) goto handle_error;
@@ -377,9 +384,9 @@ void passiveAccept(struct selector_key *key) {
 
     stm_init(&data->stm);
 
-    // TODO: Client handlers
-
     if (selector_fd_set_nio(clientSocket) == -1) goto handle_error;
+
+    metricsNewConnection();
 
     selector_status selectorStatus = selector_register(key->s, clientSocket, &pop3Handlers, OP_WRITE, data);
 
