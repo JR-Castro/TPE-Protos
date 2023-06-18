@@ -34,6 +34,7 @@ static void sigterm_handler(const int signal) {
 
 int main(const int argc, char **argv) {
     parse_args(argc, argv, &pop3_args);
+    setLogLevel(INFO);
 
     close(STDIN_FILENO);
 

@@ -9,6 +9,7 @@
 #include "logger.h"
 #include "file_handlers.h"
 #include "selector.h"
+#include "netutils.h"
 
 struct command_function {
     char *name;
@@ -117,6 +118,8 @@ static enum pop3_state executePass(struct selector_key *key, struct command *com
             errResponse(data, "Error reading mails");
             return POP3_ERROR;
         }
+
+        log(INFO, "User \"%s\" logged in from %s", data->user.username, sockaddr_to_human_buffered((struct sockaddr*)&data->addr));
 
         okResponse(data, "Logged in");
     } else {

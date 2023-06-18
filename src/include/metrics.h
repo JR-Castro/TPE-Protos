@@ -3,6 +3,7 @@
 #define TPE_PROTOS_METRICS_H
 
 #include <stddef.h>
+#include <stdint.h>
 
 struct metrics {
     size_t currentConnections;
