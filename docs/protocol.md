@@ -91,6 +91,7 @@ Los valores ***TYPE*** y ***CMD*** deben coincidir con los valores indicados en 
 | Ver cantidad de conexiones históricas   | 0x00     | 0x01    | Uint64                                                    |
 | Ver cantidad de conexiones concurrentes | 0x00     | 0x02    | Uint16                                                    |
 | Ver cantidad de bytes transferidos      | 0x00     | 0x03    | Uint64                                                    |
+| Ver tamaño de pagina de usuarios        | 0x00     | 0x04    |                                                           |
 | Detener el servidor                     | 0x01     | 0x00    | -                                                         |
 | Agregar un usuario                      | 0x01     | 0x01    | -                                                         |
 | Borrar un usuario                       | 0x01     | 0x02    | -                                                         |
