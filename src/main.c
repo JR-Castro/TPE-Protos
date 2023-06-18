@@ -24,7 +24,7 @@ int serverSocket = -1;
 int managementSocket = -1;
 
 // skipcq: CXX-W2009
-static bool terminate = false;
+bool terminate = false;
 
 static int setupSocket(char *addr, int port);
 static int setupManagementSocket(char *addr, int port);
