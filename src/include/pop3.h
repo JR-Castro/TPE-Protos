@@ -16,7 +16,6 @@
 
 struct client_data {
     struct sockaddr_storage addr;
-    socklen_t addrLen;
 
     struct buffer inputBuffer;
     uint8_t inputBufferData[BUFFER_SIZE];

@@ -367,7 +367,6 @@ void passiveAccept(struct selector_key *key) {
 
     // I don't know if this will be useful
     data->addr = clientAddr;
-    data->addrLen = clientAddrLen;
 
     buffer_init(&data->inputBuffer, BUFFER_SIZE, data->inputBufferData);
     buffer_init(&data->outputBuffer, BUFFER_SIZE, data->outputBufferData);
