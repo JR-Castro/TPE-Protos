@@ -7,6 +7,7 @@
 #include "pop3.h"
 #include "logger.h"
 #include "metrics.h"
+#include "netutils.h"
 
 //Patch for MacOS
 #ifndef MSG_NOSIGNAL
@@ -272,11 +273,14 @@ static const struct state_definition client_states[] = {
         .state = POP3_ERROR,
     }};
 
-// TODO: Free everything
 static void closeConnection(struct selector_key *key) {
     struct client_data *data = key->data;
 
-    log(INFO, "Closing connection with fd %d", key->fd);
+    if (data->isLoggedIn) {
+        log(INFO, "Closing connection with user \"%s\" from %s", data->user.username, sockaddr_to_human_buffered((struct sockaddr*)&data->addr))
+    } else {
+        log(INFO, "Closing connection with %s", sockaddr_to_human_buffered((struct sockaddr*)&data->addr))
+    }
 
     if (data->commandParser != NULL) {
         command_parser_destroy(data->commandParser);
@@ -363,7 +367,6 @@ void passiveAccept(struct selector_key *key) {
 
     // I don't know if this will be useful
     data->addr = clientAddr;
-    data->addrLen = clientAddrLen;
 
     buffer_init(&data->inputBuffer, BUFFER_SIZE, data->inputBufferData);
     buffer_init(&data->outputBuffer, BUFFER_SIZE, data->outputBufferData);
@@ -386,11 +389,11 @@ void passiveAccept(struct selector_key *key) {
 
     if (selector_fd_set_nio(clientSocket) == -1) goto handle_error;
 
-    metricsNewConnection();
-
     selector_status selectorStatus = selector_register(key->s, clientSocket, &pop3Handlers, OP_WRITE, data);
-
     if (selectorStatus != SELECTOR_SUCCESS) goto handle_error;
+
+    metricsNewConnection();
+    log(INFO, "New connection from %s", sockaddr_to_human_buffered((struct sockaddr*)&clientAddr));
 
     return;
 

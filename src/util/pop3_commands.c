@@ -9,6 +9,7 @@
 #include "logger.h"
 #include "file_handlers.h"
 #include "selector.h"
+#include "netutils.h"
 
 struct command_function {
     char *name;
@@ -115,12 +116,16 @@ static enum pop3_state executePass(struct selector_key *key, struct command *com
 
         if (fill_file_array(key) < 0) {
             errResponse(data, "Error reading mails");
-            return POP3_ERROR;
+            log(ERROR, "Error reading mails from user \"%s\"", data->user.username)
+            return POP3_WRITE;
         }
+
+        log(INFO, "User \"%s\" logged in from %s", data->user.username, sockaddr_to_human_buffered((struct sockaddr*)&data->addr))
 
         okResponse(data, "Logged in");
     } else {
         errResponse(data, "Invalid credentials");
+        log(INFO, "Attempted log in as user \"%s\" from %s", data->user.username, sockaddr_to_human_buffered((struct sockaddr*)&data->addr));
     }
 
     return POP3_WRITE;
@@ -146,7 +151,7 @@ static enum pop3_state executeStat(struct selector_key *key, struct command *com
 
     if (data->fileArray == NULL) {
         errResponse(data, "Error reading mails");
-        return POP3_ERROR;
+        return POP3_WRITE;
     }
 
     char response[MAX_ONELINE_LENGTH];
