@@ -51,7 +51,7 @@ nc -C -v localhost 1110
 | -d \<directory>  | Directorio donde se almacenarán los mails..         |
 | -v               | Imprime información sobre la versión y termina.     |
 
-## Comandos soportados por el cliente
+## Comandos soportados por el cliente de management
 | Comandos         | Descripción                                         |
 |------------------|-----------------------------------------------------|
 | USER \<username> | Autentica al usuario con el nombre de usuario.      |
@@ -65,16 +65,12 @@ nc -C -v localhost 1110
 | RSET             | Desmarca todos los mails marcados para borrarse.    |
 | QUIT             | Cierra la conexión.                                 |
 | CAPA             | Devuelve la lista de comandos soportados.           |
-
-## Comandos soportados por el cliente de management
-| Comandos         | Descripción                             |
-|------------------|-----------------------------------------|
-| GET_USERS        | Lista de usuarios.                      |
-| GET_HISTORIC     | Cantidad de conexiones históricas.      |
-| GET_CONCURRENT   | Cantidad de conexiones concurrentes.    |
-| GET_BYTES        | Cantidad de bytes transferidos.         |
-| STOP             | Detiene el servidor.                    |
-| ADD_USER         | Agrega un usuario.                      |
-| DEL_USER         | Elimina un usuario.                     |
-| CHANGE_PAGE_SIZE | Cambia el tamaño de página de usuarios. |
-| HELP             | Lista de comandos.                      |
+| GET_USERS        | Lista de usuarios.                                  |
+| GET_HISTORIC     | Cantidad de conexiones históricas.                  |
+| GET_CONCURRENT   | Cantidad de conexiones concurrentes.                |
+| GET_BYTES        | Cantidad de bytes transferidos.                     |
+| STOP             | Detiene el servidor.                                |
+| ADD_USER         | Agrega un usuario.                                  |
+| DEL_USER         | Elimina un usuario.                                 |
+| CHANGE_PAGE_SIZE | Cambia el tamaño de página de usuarios.             |
+| HELP             | Lista de comandos.                                  |
