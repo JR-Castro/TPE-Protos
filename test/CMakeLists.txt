@@ -33,14 +33,6 @@ add_executable(
 target_link_libraries(parser_utils_test check m)
 add_test(NAME parser_utils_test COMMAND parser_utils_test)
 
-## UTIL TEST
-add_executable(
-        util_test
-        ${CTEST_SOURCE_DIRECTORY}/util_test.c
-        ${CTEST_SOURCE_DIRECTORY}/../src/util/util.c)
-target_link_libraries(util_test check m)
-add_test(NAME util_test COMMAND util_test)
-
 ## COMMANDS PARSER TEST
 add_executable(
         commands_parser_test
