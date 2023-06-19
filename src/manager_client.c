@@ -44,33 +44,33 @@ static bool get_bytes_transf_request(struct manager_request *req, uint8_t *paylo
 * VARIABLES
 ***/
 static struct manager_command mgmt_commands[] = {
-        {"help", "Print usage/help info", NULL, 0, NULL},
+        {"help", "Print usage/help info\n", NULL, 0, NULL},
 
-        {"list", "Return the requested page of the user's directory\tUsage: list <page>\n",
+        {"list", "Return the requested page of the user's directory\tUsage:\t list <page>\n",
               "User", 1,   get_list_request},
 
-        {"get-page-size", "Return number of user per page (max 200)\tUsage: get-page-size\n",
+        {"get-page-size", "Return number of user per page (max 200)\nUsage:\t get-page-size\n",
                 "User per page", 0, get_page_size_request},
 
-        {"connections", "Return the number of concurrent connections in the server\tUsage: connections\n",
+        {"connections", "Return the number of concurrent connections in the server\nUsage:\t connections\n",
          "Concurrent connections now", 0, get_concurrent_request},
 
-        {"bytes", "Return the number of bytes sent by the server\tUsage: bytes\n",
+        {"bytes", "Return the number of bytes sent by the server\nUsage:\t bytes\n",
          "Bytes sent", 0, get_bytes_transf_request},
 
-        {"historic", "Return the number of requests served by the server\tUsage: historic\n",
+        {"historic", "Return the number of requests served by the server\nUsage:\t historic\n",
          "Requests served", 0, get_historic_request},
 
-        {"add-user", "Add a new user to the server\tUsage: add-user <username>\n",
+        {"add-user", "Add a new user to the server\nUsage:\t add-user <username>\n",
          "User", 1, set_add_user_request},
 
-        {"del-user", "Delete a user from the server\tUsage: del-user <username>\n",
+        {"del-user", "Delete a user from the server\nUsage:\t del-user <username>\n",
          "User", 1, set_del_user_request},
 
-        {"set-page-size", "Set the number of users per page (max 200)\tUsage: set-page-size <page_size>\n",
+        {"set-page-size", "Set the number of users per page (max 200)\nUsage:\t set-page-size <page_size>\n",
          "User per page", 1, set_page_size_request},
 
-        {"stop", "Stop the server\tUsage: stop\n",
+        {"stop", "Stop the server\nUsage:\t stop\n",
          NULL, 0, set_terminate_request},
 };
 
@@ -84,7 +84,7 @@ uint32_t token;
 ***/
 int main(int argc, const char *argv[]) {
     if (argc != 3) {
-        log(ERROR, "Usage: ./mgmtmgmtclient <server_addr> <server_port>");
+        log(ERROR, "Usage:\t ./mgmtmgmtclient <server_addr> <server_port>");
         goto failure;
     }
     token = get_auth_token();
@@ -232,8 +232,8 @@ static int build_request(struct manager_request *req, const char* command, char*
             mgmt_commands[i].params_num == 0 && param == NULL  )) {
             mgmt_commands[i].request_builder(req, param);
             idx = i;
+            break;
         }
-        break;
     }
     return idx;
 }
@@ -370,8 +370,9 @@ static bool get_bytes_transf_request(struct manager_request *req, uint8_t *paylo
 }
 
 static void print_help(void) {
-    printf("<command_name> <description> <usage>\n");
+    printf("====================================== HELP ================================================\n");
     for (int i = 0; i < N(mgmt_commands); i++) {
-        printf("%s\t%s\n", mgmt_commands[i].name, mgmt_commands[i].description);
+        printf("> %-*s\t| %s", 15, mgmt_commands[i].name, mgmt_commands[i].description);
+        printf("============================================================================================\n");
     }
 }
