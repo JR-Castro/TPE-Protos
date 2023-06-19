@@ -21,4 +21,7 @@
 #define MAX_USERNAME 64
 #define MAX_PASSWORD 64
 
+// Used for filter command
+#define MAX_COMMAND_LENGTH 1024
+
 #endif //TPE_PROTOS_DEFINITIONS_H

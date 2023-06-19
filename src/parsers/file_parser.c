@@ -1,7 +1,8 @@
 #include "file_parser.h"
 
 void file_parser_init(struct file_parser *p) {
-    p->state = NORMAL;
+    // Start on newline, so if . is on first line of file it also works
+    p->state = CRLF;
 }
 
 enum file_parser_event file_parser_feed(struct file_parser *p, uint8_t b) {
