@@ -18,7 +18,6 @@ include_directories(../src/include)
 add_executable(
         parser_test
         ${CTEST_SOURCE_DIRECTORY}/parser_test.c
-        ${CTEST_SOURCE_DIRECTORY}/../src/util/util.c
         ${CTEST_SOURCE_DIRECTORY}/../src/parsers/parser.c)
 target_link_libraries(parser_test check m)
 add_test(NAME parser_test COMMAND parser_test)
@@ -27,7 +26,6 @@ add_test(NAME parser_test COMMAND parser_test)
 add_executable(
         parser_utils_test
         ${CTEST_SOURCE_DIRECTORY}/parser_utils_test.c
-        ${CTEST_SOURCE_DIRECTORY}/../src/util/util.c
         ${CTEST_SOURCE_DIRECTORY}/../src/parsers/parser_utils.c
         ${CTEST_SOURCE_DIRECTORY}/../src/parsers/parser.c)
 target_link_libraries(parser_utils_test check m)
@@ -37,7 +35,6 @@ add_test(NAME parser_utils_test COMMAND parser_utils_test)
 add_executable(
         commands_parser_test
         ${CTEST_SOURCE_DIRECTORY}/commands_parser_test.c
-        ${CTEST_SOURCE_DIRECTORY}/../src/util/util.c
         ${CTEST_SOURCE_DIRECTORY}/../src/util/logger.c
         ${CTEST_SOURCE_DIRECTORY}/../src/util/emalloc.c
         ${CTEST_SOURCE_DIRECTORY}/../src/util/buffer.c
