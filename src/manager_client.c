@@ -14,6 +14,7 @@
 #include "logger.h"
 #include "manager_protocol.h"
 #include "definitions.h"
+#include "emalloc.h"
 
 #define TIMEOUT_SEC  5
 #define INPUT_SIZE 100
@@ -22,7 +23,7 @@
 * STATIC PROTOTYPES
 ***/
 static uint32_t get_auth_token(void);
-static int parse_input(const char* command, char* arg);
+static int parse_input(char **command, char **arg);
 static char * get_error_message(int64_t status_code);
 static int build_request(struct manager_request *req, const char* command, char* param);
 static void process_response(struct manager_request req, struct manager_response rsp, char *msg);
@@ -131,8 +132,8 @@ int main(int argc, const char *argv[]) {
 
     while (true) {
         command = param = NULL;
-        if (parse_input(command, param) < 0) { continue; }
-        log(INFO, "=== Command: %s, Param: %s", command, param);
+        if (parse_input(&command, &param) < 0) { continue; }
+
         if (strcmp(command, "help") == 0) {
             print_help();
             continue;
@@ -189,27 +190,36 @@ failure:
 static uint32_t get_auth_token(void) {
     const char *env_token = getenv(TOKEN);
     if (env_token == NULL || strlen(env_token) != TOKEN_BYTES) {
-        log(ERROR, "Missing or invalid env_token environment variable");
+        log(ERROR, "Missing or invalid token environment variable");
         return 0;
     }
 
     return strtoul(env_token, NULL, 10);
 }
 
-static int parse_input(const char *command, char* arg) {
+static int parse_input(char **command, char **arg) {
     char input[INPUT_SIZE] = {0};
     if (fgets(input, INPUT_SIZE, stdin) == NULL || *input == 0) {
         printf("Empty or Invalid command\n");
         return -1;
     }
+
+    // Remove newline character from input
+    input[strcspn(input, "\r\n")] = '\0';
+
     // Split command and argument
-    input[strcspn(input, "\r\n")] = 0;
-    command = input;
-    arg = strchr(input, ' ');
-    if (arg != NULL) {
-        *arg = '\0';
-        arg++;
+    char *space = strchr(input, ' ');
+    if (space != NULL) {
+        *space = '\0';
+        *arg = malloc(INPUT_SIZE);
+        strncpy(*arg, space + 1, INPUT_SIZE - (space - input));
+    } else {
+        *arg = NULL;
     }
+
+    *command = malloc(INPUT_SIZE);
+    strncpy(*command, input, INPUT_SIZE);
+
     return 0;
 }
 
