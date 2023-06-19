@@ -57,3 +57,17 @@ add_executable(
         ${CTEST_SOURCE_DIRECTORY}/buffer_test.c)
 target_link_libraries(buffer_test check m)
 add_test(NAME buffer_test COMMAND buffer_test)
+
+## MANAGER PROTOCOL TEST
+add_executable(
+        manager_protocol_test
+        ${CTEST_SOURCE_DIRECTORY}/manager_protocol_test.c
+        ${CTEST_SOURCE_DIRECTORY}/../src/manager/manager_protocol.c
+        ${CTEST_SOURCE_DIRECTORY}/../src/util/buffer.c
+        ${CTEST_SOURCE_DIRECTORY}/../src/util/emalloc.c
+        ${CTEST_SOURCE_DIRECTORY}/../src/util/logger.c
+        ${CTEST_SOURCE_DIRECTORY}/../src/util/users.c
+        ${CTEST_SOURCE_DIRECTORY}/../src/parsers/parser_utils.c
+        ${CTEST_SOURCE_DIRECTORY}/../src/parsers/parser.c)
+target_link_libraries(manager_protocol_test check m)
+add_test(NAME manager_protocol_test COMMAND manager_protocol_test)
