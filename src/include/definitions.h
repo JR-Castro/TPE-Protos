@@ -2,7 +2,6 @@
 #define TPE_PROTOS_DEFINITIONS_H
 
 // Used in pop3.h
-// TODO: Define a proper buffer size
 #define BUFFER_SIZE 4096
 // POP3 defines a max of 512 chars, including "-ERR " and "\r\n"
 // 255 - 4 - 2 (\r\n) + 1 (\0) = 250
@@ -30,10 +29,12 @@
 #define MANAGER_RESPONSE_HEADER_SIZE 7
 
 // Manager token
-#define TOKEN_BYTES 4
 #define TOKEN "TOKEN"
 // Misc
 #define PWD_DELIMETER ':'
 // Return number of elements in array
 #define N(x) (sizeof(x)/sizeof(x[0]))
+// Used for filter command
+#define MAX_COMMAND_LENGTH 1024
+
 #endif //TPE_PROTOS_DEFINITIONS_H

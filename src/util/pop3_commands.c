@@ -10,6 +10,9 @@
 #include "file_handlers.h"
 #include "selector.h"
 #include "netutils.h"
+#include "args.h"
+
+extern struct pop3_args pop3_args;
 
 struct command_function {
     char *name;
@@ -238,6 +241,45 @@ static enum pop3_state executeRset(struct selector_key *key, struct command *com
     return POP3_WRITE;
 }
 
+static int openFileForRetr(struct client_data *data, char *filepath) {
+    int fd = -1;
+    FILE *file = NULL;
+    
+    if (pop3_args.filter_command == NULL) {
+        fd = open(filepath, O_RDONLY);
+        if (fd < 0) {
+            log(ERROR, "Error opening file");
+        }
+        return fd;
+    }
+
+    char auxbuffer[MAX_COMMAND_LENGTH] = {0};
+    if (snprintf(auxbuffer, MAX_COMMAND_LENGTH, "cat %s | %s", filepath, pop3_args.filter_command) >= MAX_COMMAND_LENGTH) {
+        log(ERROR, "Command too long");
+        goto handle_error;
+    }
+
+    file = popen(auxbuffer, "r");
+    if (file == NULL) {
+        log(ERROR, "Error creating process");
+        goto handle_error;
+    }
+
+    fd = fileno(file);
+    if (fd < 0) {
+        log(ERROR, "Error getting file descriptor")
+        goto handle_error;
+    }
+
+    data->emailFile = file;
+    return fd;
+
+    handle_error:
+    if (file != NULL)
+        pclose(file);
+    return -1;
+}
+
 static enum pop3_state executeRetr(struct selector_key *key, struct command *command) {
 
     int fileFd = -1;
@@ -268,10 +310,9 @@ static enum pop3_state executeRetr(struct selector_key *key, struct command *com
         goto handle_error;
     }
 
-    fileFd = open(filepath, O_RDONLY);
+    fileFd = openFileForRetr(data, filepath);
 
     if (fileFd < 0) {
-        log(ERROR, "[RETR] Error opening file");
         errResponse(data, "Could not open file");
         goto handle_error;
     }
@@ -295,9 +336,6 @@ static enum pop3_state executeRetr(struct selector_key *key, struct command *com
     fileData->clientFd = key->fd;
     fileData->clientData = data;
     file_parser_init(&fileData->parser);
-
-
-    // TODO: Initialize file stm;
 
     selector_status selectorStatus = selector_register(key->s, fileFd, get_file_handlers(), OP_READ, fileData);
 

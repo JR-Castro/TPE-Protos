@@ -247,6 +247,9 @@ handle_error:
 
 static void stopFileWrite(const enum pop3_state state, struct selector_key *key) {
     struct client_data *data = key->data;
+    if (data->emailFd != -1) {
+        selector_unregister_fd(key->s, data->emailFd);
+    }
     data->emailFinished = false;
 }
 
@@ -292,6 +295,10 @@ static void closeConnection(struct selector_key *key) {
     if (key->fd != -1) {
         selector_unregister_fd(key->s, key->fd);
         close(key->fd);
+    }
+
+    if (data->emailFd != -1) {
+        selector_unregister_fd(key->s, data->emailFd);
     }
 
     if (data->fileArray != NULL) {
@@ -387,6 +394,7 @@ void passiveAccept(struct selector_key *key) {
     data->stm.max_state = POP3_ERROR;
     data->stm.states = client_states;
     data->commandParser = command_parser_init();
+    data->emailFd = -1;
 
     stm_init(&data->stm);
 
