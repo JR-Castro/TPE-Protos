@@ -60,12 +60,10 @@ void parse_args(const int argc, char **argv, struct pop3_args *args) {
     args->mng_addr = "127.0.0.1";
     args->mng_port = 9090;
 
-    args->origin_port = 110;
-
     int c;
 
     while (true) {
-        c = getopt(argc, argv, "hl::L::p::o::u:vd:");
+        c = getopt(argc, argv, "hl:L:p:o:u:vd:");
         if (c == -1)
             break;
 
@@ -81,9 +79,6 @@ void parse_args(const int argc, char **argv, struct pop3_args *args) {
                 break;
             case 'p':
                 args->pop3_port = port(optarg);
-                break;
-            case 'P':
-                args->origin_port = port(optarg);
                 break;
             case 'o':
                 args->mng_port = port(optarg);
