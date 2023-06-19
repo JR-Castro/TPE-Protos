@@ -1,6 +1,7 @@
 #ifndef TPE_PROTOS_MANAGER_PROTOCOL_H
 #define TPE_PROTOS_MANAGER_PROTOCOL_H
 
+#include <bits/stdint-uintn.h>
 #include "definitions.h"
 
 enum manager_packet_type {
@@ -97,5 +98,7 @@ int manager_packet_to_response(uint8_t *raw, struct manager_response *response);
 int manager_request_to_packet(struct manager_request *request, uint8_t *output, size_t *output_size);
 
 enum manager_data_type get_req_data_type(enum manager_type type, uint16_t cmd);
+
+enum manager_data_type get_res_data_type(enum manager_type type, uint16_t cmd);
 
 #endif //TPE_PROTOS_MANAGER_PROTOCOL_H

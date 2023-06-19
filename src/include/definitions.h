@@ -29,4 +29,11 @@
 #define MANAGER_REQUEST_HEADER_SIZE 10
 #define MANAGER_RESPONSE_HEADER_SIZE 7
 
+// Manager token
+#define TOKEN_BYTES 4
+#define TOKEN "TOKEN"
+// Misc
+#define PWD_DELIMETER ':'
+// Return number of elements in array
+#define N(x) (sizeof(x)/sizeof(x[0]))
 #endif //TPE_PROTOS_DEFINITIONS_H
