@@ -76,10 +76,11 @@ static enum pop3_state executeNoop(struct selector_key *key, struct command *com
 }
 
 static enum pop3_state executeCapa(struct selector_key *key, struct command *command) {
-    okResponse(key->data, "+OK\r\n"
-                     "USER\r\n"
+    okResponse(key->data, "");
+    normalResponse(key->data,"USER\r\n"
                      "PIPELINING\r\n"
-                     ".\r\n");
+                     "IMPLEMENTATION TPE-Protos-G05-v01\r\n"
+                     ".");
 
     return POP3_WRITE;
 }
