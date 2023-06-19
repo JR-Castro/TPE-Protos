@@ -45,6 +45,7 @@ usage(const char *progname)
             "   -o <conf port>   Puerto entrante conexiones management\n"
             "   -u <user:pass>   Registra usuario y contraseña de un usuario válido.\n"
             "   -d <directory>   Directorio donde se almacenarán los mails.\n"
+            "   -f <command>     Comando a ejecutar para filtrar los mails.\n"
             "   -v               Imprime información sobre la versión y termina.\n"
             "\n",
             progname);
@@ -59,15 +60,19 @@ void parse_args(const int argc, char **argv, struct pop3_args *args) {
 
     args->mng_addr = "127.0.0.1";
     args->mng_port = 9090;
+    args->filter_command = NULL;
 
     int c;
 
     while (true) {
-        c = getopt(argc, argv, "hl:L:p:o:u:vd:");
+        c = getopt(argc, argv, "hl:L:p:o:u:vd:f:");
         if (c == -1)
             break;
 
         switch (c) {
+            case 'f':
+                args->filter_command = optarg;
+                break;
             case 'h':
                 usage(argv[0]);
                 break;
