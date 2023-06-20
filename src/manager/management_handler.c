@@ -219,13 +219,14 @@ static bool validateArguments(struct manager_request *request) {
 
 static void get_users_handler(struct manager_request *request, struct manager_response *response) {
     size_t offset = (request->data.uint8_data - 1) * managerState.page_size;
-    if (offset >= user_count()) {
+    size_t userCount = user_count();
+    if (offset >= userCount) {
         response->data.string[0] = '\0';
         return;
     }
     size_t string_offset = 0;
-    for (int i = 0; i < managerState.page_size; ) {
-        strcpy(response->data.string + string_offset, user_get_username(offset+i));
+    for (int i = 0; i < managerState.page_size && offset+i < userCount; ) {
+        strcpy((char *)response->data.string + string_offset, user_get_username(offset+i));
         string_offset += strlen(user_get_username(offset+i));
         response->data.string[string_offset++] = '\n';
         i++;
@@ -266,7 +267,7 @@ static void set_add_user_handler(struct manager_request *request, struct manager
         response->status = SC_USERS_FULL;
         return;
     }
-    if (user_add_basic(request->data.string)) {
+    if (user_add_basic((char *)request->data.string)) {
         response->status = SC_OK;
     } else {
         response->status = SC_USER_ALREADY_EXISTS;
@@ -274,7 +275,7 @@ static void set_add_user_handler(struct manager_request *request, struct manager
 }
 
 static void set_remove_user_handler(struct manager_request *request, struct manager_response *response) {
-    if (user_remove(request->data.string)) {
+    if (user_remove((char *)request->data.string)) {
         response->status = SC_OK;
     } else {
         response->status = SC_USER_NOT_FOUND;
