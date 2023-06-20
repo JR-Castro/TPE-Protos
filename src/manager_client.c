@@ -7,8 +7,9 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
-#include <sys/types.h>
+#include <netdb.h>
 #include <bits/types/struct_timeval.h>
+#include <errno.h>
 
 #include "netutils.h"
 #include "logger.h"
@@ -29,6 +30,7 @@ static int build_request(struct manager_request *req, const char* command, char*
 static void process_response(struct manager_request req, struct manager_response rsp, char *msg);
 static void set_request_header(struct manager_request *req, uint8_t type, uint8_t cmd);
 static void print_help(void);
+static int udpClientSocket(const char *host, const char *service, struct addrinfo *finalAddr);
 // SET COMMAND REQUESTS
 static bool set_add_user_request(struct manager_request *req, uint8_t *payload);
 static bool set_del_user_request(struct manager_request *req, uint8_t *payload);
@@ -83,23 +85,21 @@ uint32_t token;
 * MAIN FUNCTION
 ***/
 int main(int argc, const char *argv[]) {
-    if (argc != 3) {
-        log(ERROR, "Usage:\t ./mgmtmgmtclient <server_addr> <server_port>");
-        goto failure;
-    }
-    token = get_auth_token();
     int sockfd = -1;
     int port;
     int af = AF_INET;
     char *command, *param;
     uint8_t buffin[BUFFER_SIZE], buffout[BUFFER_SIZE];
+    if (argc != 3) {
+        log(ERROR, "Usage:\t %s <server_addr> <server_port>", argv[0])
+        goto failure;
+    }
+    token = get_auth_token();
 
-    struct sockaddr_in serv_addr;
-    struct sockaddr_in6 serv_addr6;
-    memset(&serv_addr, 0, sizeof(serv_addr));
-    memset(&serv_addr6, 0, sizeof(serv_addr6));
+    struct addrinfo serverAddr;
+    memset(&serverAddr, 0, sizeof(struct addrinfo));
 
-    if ((port = htons(strtol(argv[2], NULL, 10))) <= 0) {
+    /*if ((port = htons((int)strtol(argv[2], NULL, 10))) <= 0) {
         log(ERROR, "Invalid port");
         goto failure;
     }
@@ -113,12 +113,12 @@ int main(int argc, const char *argv[]) {
         serv_addr6.sin6_port = port;
         af = AF_INET6;
     } else {
-        log(ERROR, "Invalid address");
+        log(ERROR, "Invalid address")
         goto failure;
-    }
+    }*/
 
-    if ((sockfd = socket(af, SOCK_DGRAM,0)) < 0) {
-        log(ERROR, "Unable to create socket\n");
+    if ((sockfd = udpClientSocket(argv[1], argv[2], &serverAddr)) < 0) {
+        log(ERROR, "Unable to create socket\n")
         goto failure;
     }
 
@@ -126,7 +126,7 @@ int main(int argc, const char *argv[]) {
     tv.tv_sec = TIMEOUT_SEC;
     tv.tv_usec = 0;
     if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
-        log(ERROR, "Failed manager client setsockopt");
+        log(ERROR, "Failed manager client setsockopt")
         goto failure;
     }
 
@@ -149,27 +149,26 @@ int main(int argc, const char *argv[]) {
         size_t request_size = 0;
         memset(buffin, 0, BUFFER_SIZE);
         memset(buffout, 0, BUFFER_SIZE);
+        struct sockaddr_storage fromAddr;
+        socklen_t fromAddrLen = sizeof(fromAddr);
 
         if (manager_request_to_packet(&request, buffout, &request_size) < 0) {
-            log(ERROR, "converting request to raw packet");
+            log(ERROR, "converting request to raw packet")
             continue;
         }
 
-        const struct sockaddr *serv_addr_ptr =
-                af == AF_INET ? (const struct sockaddr *) &serv_addr : (const struct sockaddr *) &serv_addr6;
-
         sendto(sockfd, buffout, request_size, MSG_CONFIRM,
-               (const struct sockaddr *)&serv_addr_ptr, sizeof(serv_addr));
+               serverAddr.ai_addr, serverAddr.ai_addrlen);
 
         if (recvfrom(sockfd, (char *)buffin,
                      BUFFER_SIZE, MSG_WAITALL,
-                     (struct sockaddr *)&serv_addr_ptr, &socklen) < 0) {
+                     (struct sockaddr *)&fromAddr, &fromAddrLen) < 0) {
             printf("Destination unreachable.\n"); // Timeout
             continue;
         }
 
         if (manager_packet_to_response(buffin, &response) < 0) {
-            log(ERROR, "converting raw packet to response");
+            log(ERROR, "converting raw packet to response")
             continue;
         }
 
@@ -179,7 +178,7 @@ int main(int argc, const char *argv[]) {
     }
 
 failure:
-    log(ERROR, "Client disconnected due to an error");
+    log(ERROR, "Client disconnected due to an error")
     close(sockfd);
     exit(EXIT_FAILURE);
 }
@@ -190,7 +189,7 @@ failure:
 static uint32_t get_auth_token(void) {
     const char *env_token = getenv(TOKEN);
     if (env_token == NULL || strlen(env_token) != TOKEN_BYTES) {
-        log(ERROR, "Missing or invalid token environment variable");
+        log(ERROR, "Missing or invalid token environment variable")
         return 0;
     }
 
@@ -230,7 +229,7 @@ static int build_request(struct manager_request *req, const char* command, char*
         if (strcmp(command, mgmt_commands[i].name) == 0
         && (mgmt_commands[i].params_num != 0 && param != NULL ||
             mgmt_commands[i].params_num == 0 && param == NULL  )) {
-            mgmt_commands[i].request_builder(req, param);
+            mgmt_commands[i].request_builder(req, (uint8_t*)param);
             idx = i;
             break;
         }
@@ -239,7 +238,7 @@ static int build_request(struct manager_request *req, const char* command, char*
 }
 
 static void process_response(struct manager_request req, struct manager_response rsp, char *msg) {
-    int64_t sc = (req.id != rsp.id) ? -1 : rsp.status;
+    int8_t sc = (req.id != rsp.id) ? -1 : rsp.status;
     if (sc != SC_OK) {
         printf("[Error] %s.\n", get_error_message(sc));
         return;
@@ -292,6 +291,45 @@ static char * get_error_message(int64_t status_code) {
         default:
             break;
     }
+    return "Something went wrong";
+}
+
+static int udpClientSocket(const char *host, const char *service, struct addrinfo *finalAddr) {
+    struct addrinfo addrCriteria;
+    struct addrinfo *servAddr;
+    memset(&addrCriteria, 0, sizeof(addrCriteria));
+    addrCriteria.ai_family = AF_UNSPEC;
+    addrCriteria.ai_socktype = SOCK_DGRAM;
+    addrCriteria.ai_protocol = IPPROTO_UDP;
+
+    int rtnVal = getaddrinfo(host, service, &addrCriteria, &servAddr);
+    if (rtnVal != 0) {
+        log(ERROR, "getaddrinfo() failed: %s", gai_strerror(rtnVal))
+        return -1;
+    }
+
+    int sock = -1;
+
+    for (struct addrinfo *addr = servAddr; addr != NULL && sock == -1; addr = addr->ai_next) {
+        errno = 0;
+        sock = socket(addr->ai_family, addr->ai_socktype, addr->ai_protocol);
+        if (sock < 0) {
+            // TODO: Use sockaddr_to_human_buffered
+            log(DEBUG, "Can't create socket on one address")
+            continue;
+        }
+
+        if (connect(sock, addr->ai_addr, addr->ai_addrlen) < 0) {
+            log(DEBUG, "Can't connect to one address")
+            close(sock);
+            sock = -1;
+        } else {
+            memcpy(finalAddr, addr, sizeof(struct addrinfo));
+            finalAddr->ai_next = NULL;
+        }
+    }
+    freeaddrinfo(servAddr);
+    return sock;
 }
 
 // REQUEST HEADER BUILDER
