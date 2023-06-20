@@ -52,9 +52,9 @@ static void fileRead(struct selector_key *key) {
         if (status != SELECTOR_SUCCESS) goto handle_error;
 
         data->clientData->emailFinished = true;
-        data->clientData->emailFd = 0;
+        data->clientData->emailFd = -1;
 
-        goto finally;
+        goto only_wakeup_client;
     }
 
     buffer_write_adv(&data->readBuffer, count);
@@ -77,14 +77,13 @@ static void fileRead(struct selector_key *key) {
 
     }
 
-    // We can't read anymore, either input buffer is empty or output buffer is full
-    // Wake up client to write
-
-finally:
-    status = selector_set_interest(key->s, data->clientFd, OP_WRITE);
-    if (status != SELECTOR_SUCCESS) goto handle_error;
     // Wait for client to wake us up
     status = selector_set_interest_key(key, OP_NOOP);
+    if (status != SELECTOR_SUCCESS) goto handle_error;
+only_wakeup_client:
+    // We can't read anymore, either input buffer is empty or output buffer is full
+    // Wake up client to write
+    status = selector_set_interest(key->s, data->clientFd, OP_WRITE);
     if (status != SELECTOR_SUCCESS) goto handle_error;
 
 handle_error:
@@ -96,7 +95,14 @@ static void fileClose(struct selector_key *key) {
     struct client_data *clientData = data->clientData;
 
     clientData->emailFinished = true;
-    clientData->emailFd = 0; // Is this necessary?
+    if (clientData->emailFile != NULL) {
+        pclose(clientData->emailFile);
+        clientData->emailFile = NULL;
+        clientData->emailFd = -1;
+    } else {
+        close(key->fd);
+        clientData->emailFd = -1;
+    }
 
     free(data);
 }

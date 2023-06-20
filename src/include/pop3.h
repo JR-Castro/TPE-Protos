@@ -36,6 +36,7 @@ struct client_data {
     unsigned int totalMailSize;
     int emailFd;
     bool emailFinished;
+    FILE *emailFile;
 
     char error[MAX_ERROR_LENGTH];
 };
