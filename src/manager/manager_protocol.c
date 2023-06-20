@@ -167,12 +167,12 @@ int manager_response_to_packet(struct manager_response *response, uint8_t *outpu
     /* Convert version */
     // Since they are one byte long, we can just copy them
     *buffer_p = response->version;
-    buffer_p += sizeof(uint8_t);
+    output += sizeof(uint8_t);
 
     /* Convert status */
     // Since they are one byte long, we can just copy them
     *buffer_p = response->status;
-    buffer_p += sizeof(uint8_t);
+    output += sizeof(uint8_t);
 
     /* Convert type */
     *output = response->type;
