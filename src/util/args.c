@@ -25,6 +25,20 @@ port(const char *s) {
     return (unsigned short)sl;
 }
 
+static uint32_t
+token(const char *s) {
+    char *end     = 0;
+    uint32_t sl = strtol(s, &end, 10);
+
+    if (end == s|| '\0' != *end
+        || ((SHRT_MIN == sl || SHRT_MAX == sl) && ERANGE == errno)
+        || sl < 0 || sl > UINT32_MAX) {
+        fprintf(stderr, "token should in in the range of 0-4294967295: %s\n", s);
+        exit(1);
+    }
+    return (uint32_t)sl;
+}
+
 static void
 version(void) {
     fprintf(stderr, "Pop3 version 0.0\n"
@@ -45,6 +59,7 @@ usage(const char *progname)
             "   -o <conf port>   Puerto entrante conexiones management\n"
             "   -u <user:pass>   Registra usuario y contraseña de un usuario válido.\n"
             "   -d <directory>   Directorio donde se almacenarán los mails.\n"
+            "   -t <token>       Token de autenticación para el servicio de management.\n"
             "   -v               Imprime información sobre la versión y termina.\n"
             "\n",
             progname);
@@ -54,16 +69,16 @@ usage(const char *progname)
 void parse_args(const int argc, char **argv, struct pop3_args *args) {
     memset(args, 0, sizeof(*args)); // sobre todo para setear en null los punteros de user
 
-    args->pop3_addr = "0.0.0.0";
+    args->pop3_addr = "::";
     args->pop3_port = 1110;
 
-    args->mng_addr = "127.0.0.1";
+    args->mng_addr = "::";
     args->mng_port = 9090;
 
     int c;
 
     while (true) {
-        c = getopt(argc, argv, "hl:L:p:o:u:vd:");
+        c = getopt(argc, argv, "hl::L::p::o::u:vd:t:");
         if (c == -1)
             break;
 
@@ -91,6 +106,9 @@ void parse_args(const int argc, char **argv, struct pop3_args *args) {
                 break;
             case 'd':
                 args->pop3_directory = optarg;
+                break;
+            case 't':
+                args->manager_token = token(optarg);
                 break;
             case 'v':
                 version();

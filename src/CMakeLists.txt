@@ -9,7 +9,7 @@ load_cache(${CMAKE_CURRENT_SOURCE_DIR}/ ../CMakeCache.txt)
 include_directories(${PROJECT_ROOT_DIR}/src/include/)
 
 # Main executable
-file(GLOB_RECURSE SOURCES "util/*.c" "parsers/*.c")
+file(GLOB_RECURSE SOURCES "util/*.c" "parsers/*.c" "manager/*.c")
 message(STATUS "SOURCES: ${SOURCES}")
 add_executable(pop3server ${SOURCES} main.c pop3.c)
 target_link_libraries(pop3server pthread)

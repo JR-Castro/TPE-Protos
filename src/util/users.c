@@ -19,6 +19,7 @@ int user_authenticate(char *username, char *password) {
 
 int user_add(char *username, char *password) {
     if (users_count == MAX_USERS) return -1;
+    if (user_exists(username)) return -1;
     strncpy(users[users_count].username, username, MAX_USERNAME);
     strncpy(users[users_count].password, password, MAX_PASSWORD);
     users_count++;
@@ -70,4 +71,13 @@ int user_change_username(char *username, char *new_username) {
         }
     }
     return 0;
+}
+
+size_t user_count() {
+    return users_count;
+}
+
+char *user_get_username(size_t index) {
+    if (index >= users_count) return NULL;
+    return users[index].username;
 }

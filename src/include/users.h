@@ -29,4 +29,8 @@ int user_change_password(char *username, char *new_password);
 
 int user_change_username(char *username, char *new_username);
 
+size_t user_count();
+
+char *user_get_username(size_t index);
+
 #endif //TPE_PROTOS_USERS_H
