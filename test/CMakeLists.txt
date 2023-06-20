@@ -18,7 +18,6 @@ include_directories(../src/include)
 add_executable(
         parser_test
         ${CTEST_SOURCE_DIRECTORY}/parser_test.c
-        ${CTEST_SOURCE_DIRECTORY}/../src/util/util.c
         ${CTEST_SOURCE_DIRECTORY}/../src/parsers/parser.c)
 target_link_libraries(parser_test check m)
 add_test(NAME parser_test COMMAND parser_test)
@@ -27,25 +26,15 @@ add_test(NAME parser_test COMMAND parser_test)
 add_executable(
         parser_utils_test
         ${CTEST_SOURCE_DIRECTORY}/parser_utils_test.c
-        ${CTEST_SOURCE_DIRECTORY}/../src/util/util.c
         ${CTEST_SOURCE_DIRECTORY}/../src/parsers/parser_utils.c
         ${CTEST_SOURCE_DIRECTORY}/../src/parsers/parser.c)
 target_link_libraries(parser_utils_test check m)
 add_test(NAME parser_utils_test COMMAND parser_utils_test)
 
-## UTIL TEST
-add_executable(
-        util_test
-        ${CTEST_SOURCE_DIRECTORY}/util_test.c
-        ${CTEST_SOURCE_DIRECTORY}/../src/util/util.c)
-target_link_libraries(util_test check m)
-add_test(NAME util_test COMMAND util_test)
-
 ## COMMANDS PARSER TEST
 add_executable(
         commands_parser_test
         ${CTEST_SOURCE_DIRECTORY}/commands_parser_test.c
-        ${CTEST_SOURCE_DIRECTORY}/../src/util/util.c
         ${CTEST_SOURCE_DIRECTORY}/../src/util/logger.c
         ${CTEST_SOURCE_DIRECTORY}/../src/util/emalloc.c
         ${CTEST_SOURCE_DIRECTORY}/../src/util/buffer.c
@@ -76,3 +65,17 @@ add_executable(
         ${CTEST_SOURCE_DIRECTORY}/../src/util/users.c)
 target_link_libraries(connections_test check m)
 add_test(NAME connections_test COMMAND connections_test)
+
+## MANAGER PROTOCOL TEST
+add_executable(
+        manager_protocol_test
+        ${CTEST_SOURCE_DIRECTORY}/manager_protocol_test.c
+        ${CTEST_SOURCE_DIRECTORY}/../src/manager/manager_protocol.c
+        ${CTEST_SOURCE_DIRECTORY}/../src/util/buffer.c
+        ${CTEST_SOURCE_DIRECTORY}/../src/util/emalloc.c
+        ${CTEST_SOURCE_DIRECTORY}/../src/util/logger.c
+        ${CTEST_SOURCE_DIRECTORY}/../src/util/users.c
+        ${CTEST_SOURCE_DIRECTORY}/../src/parsers/parser_utils.c
+        ${CTEST_SOURCE_DIRECTORY}/../src/parsers/parser.c)
+target_link_libraries(manager_protocol_test check m)
+add_test(NAME manager_protocol_test COMMAND manager_protocol_test)
