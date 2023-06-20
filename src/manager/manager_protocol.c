@@ -43,7 +43,7 @@ enum manager_data_type get_req_data_type(enum manager_type type, uint16_t cmd) {
     switch (type) {
         case TYPE_GET:
             if (cmd == GET_USERS)
-                return STRING_DATA;
+                return UINT8_DATA;
             return EMPTY_DATA;
         case TYPE_SET:
             switch (cmd) {
@@ -161,17 +161,16 @@ int manager_response_to_packet(struct manager_response *response, uint8_t *outpu
     }
 
     int aux;
-    *output_size = get_packet_size(RESPONSE, response->type, response->cmd, NULL);
-    uint8_t *buffer_p = output;
+    *output_size = get_packet_size(RESPONSE, response->type, response->cmd, response->data.string);
 
     /* Convert version */
     // Since they are one byte long, we can just copy them
-    *buffer_p = response->version;
+    *output = response->version;
     output += sizeof(uint8_t);
 
     /* Convert status */
     // Since they are one byte long, we can just copy them
-    *buffer_p = response->status;
+    *output = response->status;
     output += sizeof(uint8_t);
 
     /* Convert type */
@@ -253,8 +252,8 @@ int manager_request_to_packet(struct manager_request *request, uint8_t *output, 
     buffer_p += sizeof(uint16_t);
 
     /* Convert token */
-    *(uint64_t *) buffer_p = htonl(request->token);
-    buffer_p += sizeof(uint64_t);
+    *(uint32_t *) buffer_p = htonl(request->token);
+    buffer_p += sizeof(uint32_t);
 
     /* Convert data */
     data_to_buffer(request->data, get_req_data_type(request->type, request->cmd), buffer_p);
