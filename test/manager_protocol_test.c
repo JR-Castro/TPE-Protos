@@ -3,6 +3,7 @@
 
 #include "manager_protocol.h"
 #include "buffer.h"
+#include "logger.h"
 
 static void ck_assert_request(struct manager_request request, struct manager_request expected) {
     ck_assert_int_eq(request.version, expected.version);
@@ -31,60 +32,55 @@ START_TEST(test_manager_packet_to_response) {
     // Raw packet for testing
     uint8_t raw_packet[] = {
             0x01,             // version
-            0x02,             // status
-            0x03,             // type
-            0x01, 0x00,   // cmd (in network byte order, big-endian)
-            0x02, 0x00    // id  (in network byte order, big-endian)
+            0x00,             // status
+            0x00,             // type
+            0x00, 0x04,   // cmd (in network byte order, big-endian)
+            0x00, 0x02    // id  (in network byte order, big-endian)
     };
 
     struct manager_response expected_response;
-    expected_response.version = 0x01;
-    expected_response.status  = 0x02;
-    expected_response.type    = 0x03;
-    expected_response.cmd     = 0x0001;   // ntohs(0x0100)
-    expected_response.id      = 0x0002;   // ntohs(0x0200)
+    expected_response.version = MANAGER_VERSION_1;
+    expected_response.status  = SC_OK;
+    expected_response.type    = TYPE_GET;
+    expected_response.cmd     = GET_PAGE_SIZE;   // ntohs(0x0001)
+    expected_response.id      = 2;               // ntohs(0x0002)
 
     struct manager_response response;
     int result = manager_packet_to_response(raw_packet, &response);
 
     ck_assert_int_eq(result, 0);
-//    ck_assert_response(response, expected_response);
-//    ck_assert_mem_eq(&response, &expected_response, sizeof(struct manager_response));
+    ck_assert_response(response, expected_response);
+    ck_assert_mem_eq(&response, &expected_response, sizeof(struct manager_response) - sizeof(union manager_current_data));
 } END_TEST
 
 START_TEST(test_manager_request_to_packet) {
-    // Create a request structure for testing
-    struct manager_request request;
-    request.version = 0x01;
-    request.type    = 0x02;
-    request.cmd     = 0x001;
-    request.id      = 0x0005;
-    request.token   = 0x12345678;
+    char *token = "12345678";
+    // request structure for testing
+    struct manager_request req;
+    req.version = MANAGER_VERSION_1;
+    req.type    = TYPE_SET;
+    // Stop has no parameters so output should be the just a header
+    req.cmd     = STOP_SERVER;
+    req.id      = 5;
+    req.token   = strtol(token, NULL, 16);
 
-    // Define the expected output
+    // Expected output (should have big-endian byte order)
     uint8_t expected_output[] = {
             0x01,                               // version
-            0x02,                               // type
-            0x01, 0x00,                     // cmd (in network byte order)
-            0x02, 0x00,                     // id  (in network byte order)
-            0x78, 0x56, 0x34, 0x12  // token (in network byte order)
+            0x01,                               // type
+            0x00, 0x00,                     // cmd (in network byte order)
+            0x00, 0x05,                     // id  (in network byte order)
+            0x12, 0x34, 0x56, 0x78  // token (in network byte order)
     };
 
     uint8_t output[30];
     size_t output_size;
 
-    int result = manager_request_to_packet(&request, output, &output_size);
+    int result = manager_request_to_packet(&req, output, &output_size);
 
     ck_assert_int_eq(result, 0);
-    // Check the output buffer and size
     ck_assert_int_eq(output_size, sizeof(expected_output));
-    ck_assert_mem_eq(&output, &expected_output, output_size);
-    // Print the output buffer and size for verification (optional)
-    printf("Output Size: %zu\n", output_size);
-    for (size_t i = 0; i < output_size; i++) {
-        printf("%02x ", output[i]);
-    }
-    printf("\n");
+    ck_assert_mem_eq(output, expected_output, output_size);
 } END_TEST
 
 Suite *
