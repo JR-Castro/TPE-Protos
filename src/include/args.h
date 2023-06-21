@@ -7,13 +7,14 @@ struct pop3_args {
     char * pop3_addr;
     unsigned short pop3_port;
 
-    char * origin_addr;
-    unsigned short origin_port;
-
     char * mng_addr;
     unsigned short mng_port;
 
     char * pop3_directory;
+
+    uint32_t manager_token;
+
+    char * filter_command;
 };
 
 /**
