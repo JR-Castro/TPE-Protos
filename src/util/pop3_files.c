@@ -44,6 +44,7 @@ int fill_file_array(struct selector_key *key) {
     unsigned int totalSize = 0;
 
     if (dr == NULL) {
+        log(ERROR, "Couldn't open directory, %s", directory);
         return -1;
     }
 
