@@ -5,19 +5,19 @@
 #include <stdbool.h>
 #include <string.h>
 #include <netinet/in.h>
-#include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <bits/types/struct_timeval.h>
 #include <errno.h>
+#include <limits.h>
+#include <stdint.h>
 
 #include "netutils.h"
 #include "logger.h"
 #include "manager_protocol.h"
 #include "definitions.h"
-#include "emalloc.h"
 
-#define TIMEOUT_SEC  5
+#define TIMEOUT_SEC  15
 #define INPUT_SIZE 100
 
 /*****************************************************************
@@ -28,7 +28,7 @@ static int parse_input(char **command, char **arg);
 static char * get_error_message(int64_t status_code);
 static int build_request(struct manager_request *req, const char* command, char* param);
 static void process_response(struct manager_request req, struct manager_response rsp, char *msg);
-static void set_request_header(struct manager_request *req, uint8_t type, uint8_t cmd);
+static void set_request_header(struct manager_request *req, uint8_t type, uint16_t cmd);
 static void print_help(void);
 static int udpClientSocket(const char *host, const char *service, struct addrinfo *finalAddr);
 // SET COMMAND REQUESTS
@@ -86,8 +86,6 @@ uint32_t token;
 ***/
 int main(int argc, const char *argv[]) {
     int sockfd = -1;
-    int port;
-    int af = AF_INET;
     char *command, *param;
     uint8_t buffin[BUFFER_SIZE], buffout[BUFFER_SIZE];
     if (argc != 3) {
@@ -98,24 +96,6 @@ int main(int argc, const char *argv[]) {
 
     struct addrinfo serverAddr;
     memset(&serverAddr, 0, sizeof(struct addrinfo));
-
-    /*if ((port = htons((int)strtol(argv[2], NULL, 10))) <= 0) {
-        log(ERROR, "Invalid port");
-        goto failure;
-    }
-
-    if (inet_pton(AF_INET, argv[1], &serv_addr.sin_addr.s_addr) > 0) {
-        serv_addr.sin_family = AF_INET;
-        serv_addr.sin_port = port;
-        af = AF_INET;
-    } else if (inet_pton(AF_INET6, argv[1], &serv_addr6.sin6_addr) > 0) {
-        serv_addr6.sin6_family = AF_INET6;
-        serv_addr6.sin6_port = port;
-        af = AF_INET6;
-    } else {
-        log(ERROR, "Invalid address")
-        goto failure;
-    }*/
 
     if ((sockfd = udpClientSocket(argv[1], argv[2], &serverAddr)) < 0) {
         log(ERROR, "Unable to create socket\n")
@@ -145,7 +125,6 @@ int main(int argc, const char *argv[]) {
             continue;
         }
 
-        socklen_t socklen;
         size_t request_size = 0;
         memset(buffin, 0, BUFFER_SIZE);
         memset(buffout, 0, BUFFER_SIZE);
@@ -188,12 +167,18 @@ failure:
 ***/
 static uint32_t get_auth_token(void) {
     const char *env_token = getenv(TOKEN);
-    if (env_token == NULL || strlen(env_token) != TOKEN_BYTES) {
-        log(ERROR, "Missing or invalid token environment variable")
-        return 0;
+    if (env_token == NULL) {
+        log(ERROR, "Missing token environment variable")
+        exit(1);
+    }
+    uint32_t sl = strtol(env_token, NULL, 10);
+    if (((SHRT_MIN == sl || SHRT_MAX == sl) && ERANGE == errno)
+        || sl < 0 || sl > UINT32_MAX) {
+        log(ERROR, "token should in in the range of 0-4294967295: %s\n", env_token);
+        exit(1);
     }
 
-    return strtoul(env_token, NULL, 10);
+    return sl;
 }
 
 static int parse_input(char **command, char **arg) {
@@ -333,11 +318,11 @@ static int udpClientSocket(const char *host, const char *service, struct addrinf
 }
 
 // REQUEST HEADER BUILDER
-static void set_request_header(struct manager_request *req, uint8_t type, uint8_t cmd) {
+static void set_request_header(struct manager_request *req, uint8_t type, uint16_t cmd) {
     req->id = trace_id++;
-    req->version = MANAGER_VERSION_1;
+    req->version = (uint8_t)MANAGER_VERSION_1;
     req->token = token;
-    req->type = type;
+    req->type = (uint8_t)type;
     req->cmd = cmd;
 }
 
