@@ -415,5 +415,5 @@ handle_error:
         free(data);
     }
 
-    // TODO: Log error
+    log(ERROR, "Error accepting connection");
 }
