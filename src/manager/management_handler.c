@@ -204,7 +204,7 @@ static bool validateCommand(struct manager_request *request) {
 
 static bool validateArguments(struct manager_request *request) {
     bool ret = true;
-    switch (get_req_data_type(request->cmd, request->cmd)) {
+    switch (get_req_data_type(request->type, request->cmd)) {
         case UINT8_DATA:
             ret = check_set_uint8(request);
             break;
