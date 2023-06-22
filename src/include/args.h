@@ -11,6 +11,8 @@ struct pop3_args {
     unsigned short mng_port;
 
     char * pop3_directory;
+
+    uint32_t manager_token;
 };
 
 /**
