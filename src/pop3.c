@@ -143,7 +143,9 @@ static unsigned readUserCommand(struct selector_key *key) {
     }
 
 handle_error:
-    selector_set_interest_key(key, OP_NOOP);
+    status = selector_set_interest_key(key, OP_WRITE);
+    if (status != SELECTOR_SUCCESS)
+        selector_set_interest_key(key, OP_NOOP);
 
     return POP3_ERROR;
 }
@@ -271,6 +273,7 @@ static const struct state_definition client_states[] = {
     },
     {
         .state = POP3_ERROR,
+        .on_write_ready = writeResponse,
     }};
 
 static void closeConnection(struct selector_key *key) {
@@ -316,7 +319,7 @@ static const fd_handler pop3Handlers = {
 void pop3Read(struct selector_key *key) {
     struct state_machine *stm = &((struct client_data *) key->data)->stm;
     const enum pop3_state state = stm_handler_read(stm, key);
-    if (state == POP3_ERROR || state == POP3_CLOSE) {
+    if (state == POP3_CLOSE) {
         closeConnection(key);
     }
 }

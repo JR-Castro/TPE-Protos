@@ -1,5 +1,4 @@
-#include <arpa/inet.h>
-#include <stdint.h>
+#include <netinet/in.h>
 #include <string.h>
 
 #include "manager_protocol.h"

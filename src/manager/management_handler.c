@@ -267,7 +267,8 @@ static void set_add_user_handler(struct manager_request *request, struct manager
         response->status = SC_USERS_FULL;
         return;
     }
-    if (user_add_basic((char *)request->data.string)) {
+
+    if (user_add_basic((char *)request->data.string) == 0) {
         response->status = SC_OK;
     } else {
         response->status = SC_USER_ALREADY_EXISTS;
