@@ -113,19 +113,16 @@ static enum pop3_state executePass(struct selector_key *key, struct command *com
     }
 
     if (user_authenticate(data->user.username, (char*)command->args1)) {
-        data->isLoggedIn = 1;
         strncpy(data->user.password, (char*)command->args1, MAX_PASSWORD);
 
         // TODO: We should use a lock in the mail.
-
         if (fill_file_array(key) < 0) {
-            errResponse(data, "Error reading mails");
-            log(ERROR, "Error reading mails from user \"%s\"", data->user.username)
-            return POP3_WRITE;
+            errResponse(data, "Login failed due to an error reading emails folder");
+            return POP3_ERROR;
         }
 
         log(INFO, "User \"%s\" logged in from %s", data->user.username, sockaddr_to_human_buffered((struct sockaddr*)&data->addr))
-
+        data->isLoggedIn = 1;
         okResponse(data, "Logged in");
     } else {
         errResponse(data, "Invalid credentials");

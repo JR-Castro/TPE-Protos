@@ -60,7 +60,6 @@ usage(const char *progname)
             "   -u <user:pass>   Registra usuario y contraseña de un usuario válido.\n"
             "   -d <directory>   Directorio donde se almacenarán los mails.\n"
             "   -t <token>       Token de autenticación para el servicio de management.\n"
-            "   -f <command>     Comando a ejecutar para filtrar los mails.\n"
             "   -v               Imprime información sobre la versión y termina.\n"
             "\n",
             progname);
@@ -80,7 +79,7 @@ void parse_args(const int argc, char **argv, struct pop3_args *args) {
     int c;
 
     while (true) {
-        c = getopt(argc, argv, "hl::L::p::o::u:vd:t:f");
+        c = getopt(argc, argv, "hl::L::p::o::u:vd:t:");
         if (c == -1)
             break;
 

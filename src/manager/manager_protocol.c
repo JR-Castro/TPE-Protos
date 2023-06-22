@@ -1,5 +1,4 @@
-#include <arpa/inet.h>
-#include <stdint.h>
+#include <netinet/in.h>
 #include <string.h>
 
 #include "manager_protocol.h"
@@ -86,10 +85,10 @@ static void buffer_to_data(union manager_current_data *output, enum manager_data
             output->uint8_data = *((uint8_t*) raw);
             break;
         case UINT16_DATA:
-            output->uint16_data = *((uint16_t*) raw);
+            output->uint16_data = ntohs(*(uint16_t *) raw);
             break;
         case UINT64_DATA:
-            output->uint64_data = *((uint64_t*) raw);
+            output->uint64_data = ntohl(*(uint64_t*) raw);
             break;
         case STRING_DATA:
             strcpy(output->string, (char*) raw);

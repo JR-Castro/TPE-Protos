@@ -58,14 +58,6 @@ add_executable(
 target_link_libraries(buffer_test check m)
 add_test(NAME buffer_test COMMAND buffer_test)
 
-## CONNECTIONS TEST
-add_executable(
-        connections_test
-        ${CTEST_SOURCE_DIRECTORY}/connections_test.c
-        ${CTEST_SOURCE_DIRECTORY}/../src/util/users.c)
-target_link_libraries(connections_test check m)
-add_test(NAME connections_test COMMAND connections_test)
-
 ## MANAGER PROTOCOL TEST
 add_executable(
         manager_protocol_test

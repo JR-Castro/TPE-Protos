@@ -204,7 +204,7 @@ static bool validateCommand(struct manager_request *request) {
 
 static bool validateArguments(struct manager_request *request) {
     bool ret = true;
-    switch (get_req_data_type(request->cmd, request->cmd)) {
+    switch (get_req_data_type(request->type, request->cmd)) {
         case UINT8_DATA:
             ret = check_set_uint8(request);
             break;
@@ -267,7 +267,8 @@ static void set_add_user_handler(struct manager_request *request, struct manager
         response->status = SC_USERS_FULL;
         return;
     }
-    if (user_add_basic((char *)request->data.string)) {
+
+    if (user_add_basic((char *)request->data.string) == 0) {
         response->status = SC_OK;
     } else {
         response->status = SC_USER_ALREADY_EXISTS;

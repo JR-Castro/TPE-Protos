@@ -29,9 +29,6 @@
 #define MANAGER_REQUEST_HEADER_SIZE 10
 #define MANAGER_RESPONSE_HEADER_SIZE 7
 
-// Used for filter command
-#define MAX_COMMAND_LENGTH 1024
-
 // Manager token
 #define TOKEN_BYTES 4
 #define TOKEN "TOKEN"

@@ -13,8 +13,6 @@ struct pop3_args {
     char * pop3_directory;
 
     uint32_t manager_token;
-
-    char * filter_command;
 };
 
 /**

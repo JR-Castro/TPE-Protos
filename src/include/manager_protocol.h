@@ -72,22 +72,22 @@ union manager_current_data {
 */
 
 struct manager_request {
-    enum manager_version version;
-    enum manager_type type;
+    uint8_t version;
+    uint8_t type;
     uint16_t cmd;
     uint16_t id;
     uint32_t token;
     union manager_current_data data;
-};
+}__attribute__((packed));
 
 struct manager_response {
-    enum manager_version version;
-    enum manager_status_code status;
-    enum manager_type type;
+    uint8_t version;
+    uint8_t status;
+    uint8_t type;
     uint16_t cmd;
     uint16_t id;
     union manager_current_data data;
-};
+}__attribute__((packed));
 
 int manager_packet_to_request(uint8_t *raw, struct manager_request *request);
 
