@@ -231,6 +231,7 @@ static void get_users_handler(struct manager_request *request, struct manager_re
         response->data.string[string_offset++] = '\n';
         i++;
     }
+    response->data.string[--string_offset] = '\0';
 }
 
 static void get_historics_handler(struct manager_request *request, struct manager_response *response) {
