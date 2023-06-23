@@ -71,3 +71,11 @@ add_executable(
         ${CTEST_SOURCE_DIRECTORY}/../src/parsers/parser.c)
 target_link_libraries(manager_protocol_test check m)
 add_test(NAME manager_protocol_test COMMAND manager_protocol_test)
+
+## CONNECTIONS TEST
+add_executable(
+        connections_test
+        ${CTEST_SOURCE_DIRECTORY}/connections_test.c
+        ${CTEST_SOURCE_DIRECTORY}/../src/util/users.c)
+target_link_libraries(connections_test check m)
+add_test(NAME connections_test COMMAND connections_test)
