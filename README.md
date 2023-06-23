@@ -13,30 +13,43 @@ por Mail User Agents tales como Mozilla Thunderbird, Microsoft Outlook y Evoluti
 Desde el directorio principal ingrese el siguiente comando:
 
 ```bash
-cd cmake-build-debug/
+cmake -S . -B bin/
 ```
 
-Luego, debe cambiar de directorio y dirigirse a src:
+Luego, debe cambiar de directorio y dirigirse a bin:
 
 ```bash
-cd src/
+cd bin
 ```
 
-Una vez allí, debe ejecutar el siguiente comando para compilar el servidor pop3:
+Para compilar el servidor pop3, usar:
 
 ```bash
-./pop3server -d [path]/.mails -u [user]:[password]
+make pop3server
+```
+
+y para compilar el cliente:
+
+```bash
+make managerclient
+```
+
+Una vez ejecutado, debe ejecutar el siguiente comando para compilar el servidor pop3:
+
+```bash
+./stc/pop3server -d [path]/.mails -u [user]:[password]
 ```
 
 Donde:
 * [path] es el path donde se encuentran los mails a enviar.
 * [user] es el usuario que se desea autenticar.
 * [password] es la contraseña del usuario que se desea autenticar.
+* Por default, escucha en la address :: y puerto 1110.
 
-Por último, para conectarse al servidor pop3, debe ejecutar el siguiente comando:
+Para ejecutar el manager, usar:
 
 ```bash
-nc -C -v localhost 1110
+./src/managerclient
 ```
 
 ## Comandos soportados
