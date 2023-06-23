@@ -53,7 +53,7 @@ usage(const char *progname)
             "Usage: %s [OPTION] ...\n"
             "\n"
             "   -h               Imprime la ayuda y termina.\n"
-            "   -l <pop3 addr>   Dirección donde servirá  el proxy POP3.\n"
+            "   -l <pop3 addr>   Dirección donde servirá  el servidor POP3.\n"
             "   -L <conf  addr>  Dirección donde servirá  el servicio de management.\n"
             "   -p <pop3 port>   Puerto entrante conexiones POP3.\n"
             "   -o <conf port>   Puerto entrante conexiones management.\n"
