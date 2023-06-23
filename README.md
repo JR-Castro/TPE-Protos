@@ -64,7 +64,7 @@ Para ejecutar el manager, usar:
 | Comandos         | Descripción                                         |
 |------------------|-----------------------------------------------------|
 | -h               | Imprime la ayuda y termina.                         |
-| -l \<pop3 addr>  | Dirección donde servirá  el proxy POP3.             |
+| -l \<pop3 addr>  | Dirección donde servirá  el servidor POP3.          |
 | -L \<conf  addr> | Dirección donde servirá  el servicio de management. |
 | -p \<pop3 port>  | Puerto entrante conexiones POP3.                    |
 | -o \<conf port>  | Puerto entrante conexiones management.              |
