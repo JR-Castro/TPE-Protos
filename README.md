@@ -56,15 +56,16 @@ Para ejecutar el manager, usar:
 | Comandos         | Descripción                                         |
 |------------------|-----------------------------------------------------|
 | -h               | Imprime la ayuda y termina.                         |
-| -l \<pop3 addr>  | Dirección donde servirá  el proxy POP3              |
+| -l \<pop3 addr>  | Dirección donde servirá  el proxy POP3.             |
 | -L \<conf  addr> | Dirección donde servirá  el servicio de management. |
 | -p \<pop3 port>  | Puerto entrante conexiones POP3.                    |
 | -o \<conf port>  | Puerto entrante conexiones management.              |
 | -u \<user:pass>  | Registra usuario y contraseña de un usuario válido. |
-| -d \<directory>  | Directorio donde se almacenarán los mails..         |
+| -d \<directory>  | Directorio donde se almacenarán los mails.          |
 | -v               | Imprime información sobre la versión y termina.     |
 
 ## Comandos soportados por el cliente de management
+Tener en consideración que estos comandos son case sensitive.
 | Comandos      | Descripción                                                  |
 |---------------|--------------------------------------------------------------|
 | help          | Imprime la info de los comandos.                             |

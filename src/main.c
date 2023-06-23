@@ -12,6 +12,7 @@
 #include "pop3.h"
 #include "args.h"
 #include "logger.h"
+#include "management_handler.h"
 #include "metrics.h"
 #include "management_handler.h"
 

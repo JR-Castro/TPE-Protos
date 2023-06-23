@@ -30,6 +30,7 @@ static int build_request(struct manager_request *req, const char* command, char*
 static void process_response(struct manager_request req, struct manager_response rsp, char *msg);
 static void set_request_header(struct manager_request *req, uint8_t type, uint16_t cmd);
 static void print_help(void);
+static void exit_client(void);
 static int udpClientSocket(const char *host, const char *service, struct addrinfo *finalAddr);
 // SET COMMAND REQUESTS
 static bool set_add_user_request(struct manager_request *req, uint8_t *payload);
@@ -47,6 +48,7 @@ static bool get_bytes_transf_request(struct manager_request *req, uint8_t *paylo
 ***/
 static struct manager_command mgmt_commands[] = {
         {"help", "Print usage/help info\n", NULL, 0, NULL},
+        {"exit", "Exit client\n", NULL, 0, NULL},
 
         {"list", "Return the requested page of the user's directory\tUsage:\t list <page>\n",
               "User", 1,   get_list_request},
@@ -117,6 +119,10 @@ int main(int argc, const char *argv[]) {
         if (strcmp(command, "help") == 0) {
             print_help();
             continue;
+        }
+
+        if (strcmp(command, "exit") == 0) {
+            exit_client();
         }
 
         int command_idx = build_request(&request, command, param);
@@ -398,4 +404,9 @@ static void print_help(void) {
         printf("> %-*s\t| %s", 15, mgmt_commands[i].name, mgmt_commands[i].description);
         printf("============================================================================================\n");
     }
+}
+
+static void exit_client(void) {
+    printf("Exiting...\n");
+    exit(EXIT_SUCCESS);
 }
