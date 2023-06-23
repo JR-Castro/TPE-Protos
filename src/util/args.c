@@ -80,7 +80,7 @@ void parse_args(const int argc, char **argv, struct pop3_args *args) {
     int c;
 
     while (true) {
-        c = getopt(argc, argv, "hl::L::p::o::u:vd:t:f:");
+        c = getopt(argc, argv, "hl:L:p:o:u:vd:t:f:");
         if (c == -1)
             break;
 
