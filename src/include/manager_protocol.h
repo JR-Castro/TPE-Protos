@@ -78,7 +78,7 @@ struct manager_request {
     uint16_t id;
     uint32_t token;
     union manager_current_data data;
-}__attribute__((packed));
+};
 
 struct manager_response {
     uint8_t version;
@@ -87,7 +87,7 @@ struct manager_response {
     uint16_t cmd;
     uint16_t id;
     union manager_current_data data;
-}__attribute__((packed));
+};
 
 int manager_packet_to_request(uint8_t *raw, struct manager_request *request);
 
