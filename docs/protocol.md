@@ -2,7 +2,7 @@
 
 Este protocolo permite a un administrador monitorear métricas, modificar algunos valores de configuración y detener el servidor. Es binario, no orientado a sesión el cual funciona sobre UDP.
 
-Para poder usarlo, se debe pasar como argumento al inicial el servidor el token que se va a utilizar para la autenticación. Debe ocupar 4 bytes.
+Para poder usarlo, se debe pasar como argumento al iniciar el servidor el token que se va a utilizar para la autenticación. Debe ocupar 4 bytes.
 
 ## Especificaciones
 
