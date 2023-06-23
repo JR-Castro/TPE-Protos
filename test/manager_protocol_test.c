@@ -3,7 +3,6 @@
 
 #include "manager_protocol.h"
 #include "buffer.h"
-#include "logger.h"
 
 static void ck_assert_request(struct manager_request request, struct manager_request expected) {
     ck_assert_int_eq(request.version, expected.version);

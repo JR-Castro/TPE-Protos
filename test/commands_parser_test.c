@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <stdio.h>
 #include <check.h>
 #include "buffer.h"
 #include "macros.h"
