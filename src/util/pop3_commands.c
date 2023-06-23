@@ -206,7 +206,7 @@ static enum pop3_state executeDele(struct selector_key *key, struct command *com
         goto finally;
     }
 
-    unsigned int mailIndex = strtoul((char*)command->args1, NULL, 10);
+    unsigned int mailIndex = strtoul((char*)command->args1, NULL, 10) - 1;
 
     if (mailIndex >= data->fileArraySize) {
         errResponse(key->data, "Invalid mail index");
@@ -220,7 +220,7 @@ static enum pop3_state executeDele(struct selector_key *key, struct command *com
 
     data->fileArray[mailIndex].deleted = true;
     char response[MAX_ONELINE_LENGTH];
-    snprintf(response, MAX_ONELINE_LENGTH, "Message %u deleted", mailIndex);
+    snprintf(response, MAX_ONELINE_LENGTH, "Message %u deleted", mailIndex + 1);
     okResponse(key->data, response);
 
 finally:
