@@ -8,6 +8,14 @@ por Mail User Agents tales como Mozilla Thunderbird, Microsoft Outlook y Evoluti
 * atender a múltiples clientes en forma concurrente y simultánea (al menos 500)
 * soportar autenticación usuario / contraseña y pipelining
 
+## Dependencias
+
+Para compilar los tests se requiere la librería [check](https://github.com/libcheck/check). En Ubuntu, se puede instalar con:
+
+```bash
+sudo apt install check
+```
+
 ## Construcción y Ejecución
 
 Desde el directorio principal ingrese el siguiente comando:
@@ -56,7 +64,7 @@ Para ejecutar el manager, usar:
 | Comandos         | Descripción                                         |
 |------------------|-----------------------------------------------------|
 | -h               | Imprime la ayuda y termina.                         |
-| -l \<pop3 addr>  | Dirección donde servirá  el proxy POP3.             |
+| -l \<pop3 addr>  | Dirección donde servirá  el servidor POP3.          |
 | -L \<conf  addr> | Dirección donde servirá  el servicio de management. |
 | -p \<pop3 port>  | Puerto entrante conexiones POP3.                    |
 | -o \<conf port>  | Puerto entrante conexiones management.              |
