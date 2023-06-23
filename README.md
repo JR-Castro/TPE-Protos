@@ -8,6 +8,14 @@ por Mail User Agents tales como Mozilla Thunderbird, Microsoft Outlook y Evoluti
 * atender a múltiples clientes en forma concurrente y simultánea (al menos 500)
 * soportar autenticación usuario / contraseña y pipelining
 
+## Dependencias
+
+Para compilar los tests se requiere la librería [check](https://github.com/libcheck/check). En Ubuntu, se puede instalar con:
+
+```bash
+sudo apt install check
+```
+
 ## Construcción y Ejecución
 
 Desde el directorio principal ingrese el siguiente comando:
