@@ -133,9 +133,16 @@ static void setResponseHeader(struct manager_request *request, struct manager_re
 }
 
 static bool check_set_uint8(struct manager_request *request) {
-    switch (request->cmd) {
-        case SET_PAGE_SIZE:
-            return MIN_PAGE_SIZE <= request->data.uint8_data && request->data.uint8_data <= MAX_PAGE_SIZE;
+    if (request->type == TYPE_GET) {
+        switch (request->cmd) {
+            case GET_USERS:
+                return request->data.uint8_data > 0;
+        }
+    } else {
+        switch (request->cmd) {
+            case SET_PAGE_SIZE:
+                return MIN_PAGE_SIZE <= request->data.uint8_data && request->data.uint8_data <= MAX_PAGE_SIZE;
+        }
     }
     return true;
 }
@@ -218,6 +225,10 @@ static bool validateArguments(struct manager_request *request) {
 }
 
 static void get_users_handler(struct manager_request *request, struct manager_response *response) {
+    if (request->data.uint8_data == 0) {
+        response->data.string[0] = '\0';
+        return;
+    }
     size_t offset = (request->data.uint8_data - 1) * managerState.page_size;
     size_t userCount = user_count();
     if (offset >= userCount) {

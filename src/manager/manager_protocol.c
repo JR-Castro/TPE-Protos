@@ -113,7 +113,7 @@ static void data_to_buffer(union manager_current_data data, enum manager_data_ty
             *((uint64_t*) output) = htonl(data.uint64_data);
             break;
         case STRING_DATA:
-            strcpy((char*) output, data.string);
+            strcpy((char *) output, (char *) data.string);
             break;
         case EMPTY_DATA:
         default:
