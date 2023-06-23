@@ -367,7 +367,6 @@ static bool set_page_size_request(struct manager_request *req, uint8_t *payload)
 static bool get_list_request(struct manager_request *req, uint8_t *payload) {
     set_request_header(req, TYPE_GET, GET_USERS);
     uint8_t size = strtol((char*)payload, NULL, 10);
-    if (size <= 0) { return false; }
     req->data.uint8_data = size;
     return true;
 }
